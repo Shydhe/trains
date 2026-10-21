@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#14213a">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Nice ⇄ Monaco ZOU</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column "quai" board — route + direction, next train hero, then the full timetable as a scannable list */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --ink:#14213a; --muted:#5d6a80; --line:#dde2ea;
+  --accent:#e8a317; --accent-ink:#3a2a00; --soon:#c2410c; --gone:#a8b1c0; --win:#fff6dc; --sea:#0e7490;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0d1424; --surface:#151f34; --ink:#e7ecf5; --muted:#93a0b8; --line:#26324b;
+  --accent:#f2b531; --accent-ink:#2a1e00; --soon:#fb8a4c; --gone:#4c5874; --win:#2a2410; --sea:#38bdf8; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0d1424; --surface:#151f34; --ink:#e7ecf5; --muted:#93a0b8; --line:#26324b;
+  --accent:#f2b531; --accent-ink:#2a1e00; --soon:#fb8a4c; --gone:#4c5874; --win:#2a2410; --sea:#38bdf8; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+.wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.tnum{font-variant-numeric:tabular-nums}
+header{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.6rem;letter-spacing:.01em;margin:0;text-wrap:balance}
+.clock{font-family:var(--f-display);font-size:1.4rem;font-weight:600;color:var(--muted)}
+.routes{display:flex;gap:8px;flex-wrap:wrap}
+.routes button{font:600 .95rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer;display:flex;gap:6px;align-items:baseline}
+.routes button small{font-weight:400;color:var(--muted);font-size:.8rem}
+.routes button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.dir{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
+.dir button{font:600 1rem var(--f-display);letter-spacing:.03em;text-transform:uppercase;border:0;border-radius:9px;padding:12px 8px;background:transparent;color:var(--muted);cursor:pointer}
+.dir button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.hero{background:var(--ink);color:var(--bg);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px}
+.eyebrow{font:600 .78rem var(--f-body);letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+.big{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.big .t{font-family:var(--f-display);font-weight:700;font-size:4.2rem;line-height:1}
+.pill{font:700 1rem var(--f-display);letter-spacing:.03em;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 12px}
+.arr{font-size:1rem;opacity:.85}
+.then{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.then span{font:600 1.05rem var(--f-display);border:1px solid color-mix(in srgb,var(--bg) 35%,transparent);border-radius:8px;padding:4px 10px}
+.note{font-size:.88rem;color:var(--muted);margin:0}
+.warn{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--soon);border-radius:10px;padding:12px 14px;font-size:.92rem}
+.warn strong{color:var(--soon)}
+.warn.info{border-left-color:var(--sea)} .warn.info strong{color:var(--sea)}
+.board{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.board-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);gap:8px;flex-wrap:wrap}
+.board-head h2{font:700 1.1rem var(--f-display);letter-spacing:.04em;text-transform:uppercase;margin:0}
+.toggle{font:500 .9rem var(--f-body);color:var(--muted);display:flex;gap:6px;align-items:center}
+ol{list-style:none;margin:0;padding:0}
+li{display:grid;grid-template-columns:4.2rem 1fr auto;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line)}
+li:last-child{border-bottom:0}
+li .dep{font:700 1.45rem var(--f-display)}
+li .to{color:var(--muted);font-size:.92rem;min-width:0}
+li .in{font:600 .95rem var(--f-display);color:var(--muted);text-align:right}
+li.win{background:var(--win)}
+li.next .in,li.next .dep{color:var(--soon)}
+li.past{color:var(--gone)} li.past .to,li.past .in{color:var(--gone)}
+li.hide{display:none}
+.tag{font:600 .7rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+.tag.q{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.links{display:flex;flex-direction:column;gap:8px}
+.links a{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 16px;color:var(--ink);text-decoration:none;font-weight:600}
+.links a span{color:var(--muted);font-weight:400;font-size:.88rem;white-space:nowrap}
+footer{font-size:.8rem;color:var(--muted)}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1 id="title">Nice-Ville ⇄ Monaco</h1>
+    <div class="clock tnum" id="clock">--:--</div>
+  </header>
+
+  <div class="routes" role="group" aria-label="Trajet">
+    <button id="r-monaco" type="button" aria-pressed="false">Monaco <small>semaine</small></button>
+    <button id="r-antibes" type="button" aria-pressed="false">Antibes <small>week-end</small></button>
+  </div>
+
+  <div class="dir" role="group" aria-label="Sens du trajet">
+    <button id="b-ab" type="button" aria-pressed="false">Nice →</button>
+    <button id="b-ba" type="button" aria-pressed="false">→ Nice</button>
+  </div>
+
+  <section class="hero" aria-live="polite">
+    <div class="eyebrow" id="h-label">Prochain train</div>
+    <div class="big"><span class="t tnum" id="h-time">--:--</span><span class="pill tnum" id="h-in">…</span></div>
+    <div class="arr tnum" id="h-arr"></div>
+    <div class="then tnum" id="h-then"></div>
+  </section>
+
+  <div class="warn" id="banner"></div>
+
+  <section class="board">
+    <div class="board-head">
+      <h2 id="board-title">Départs</h2>
+      <label class="toggle"><input type="checkbox" id="showpast"> Trains passés</label>
+    </div>
+    <ol id="list"></ol>
+  </section>
+
+  <p class="note" id="daynote"></p>
+
+  <div class="links">
+    <a id="live" href="https://www.sncf-connect.com/train/horaires/nice/vintimille" target="_blank" rel="noopener">Vérifier les retards en direct <span>SNCF Connect ↗</span></a>
+    <a href="https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic/travaux/travaux-entre-nice-vintimille" target="_blank" rel="noopener">Travaux Nice–Vintimille <span>TER Sud ↗</span></a>
+  </div>
+
+  <footer>Horaires théoriques de la fiche ZOU ligne 04 (version du 7 juillet 2026), valables jusqu'au 12 décembre 2026. Ils ne montrent ni les retards ni les suppressions.</footer>
+</div>
+
+<script>
+// Fiche horaire ZOU 04 (V4.1, 07/07/2026). Options: f = Friday variant, q = day of service to check.
+const ROUTES = {
+  monaco: {
+    name:"Monaco", far:"Monaco", days:"semaine", flipAt:"13:00", weekend:false,
+    live:"https://www.sncf-connect.com/train/horaires/nice/vintimille",
+    win:{ab:["07:30","08:30"], ba:["18:30","19:10"]},
+    ab:[["06:24","06:51"],["06:53","07:18"],["07:02","07:28"],["07:22","07:48"],["07:34","08:00"],
+        ["07:51","08:21"],["08:03","08:28"],["08:22","08:48"],["08:34","08:59"],["08:53","09:18"],
+        ["09:02","09:27"],["09:23","09:50"],["09:34","09:59"],["09:54","10:20"]],
+    ba:[["16:35","16:59"],["16:47","17:10"],["17:04","17:29"],["17:17","17:40"],["17:36","17:59"],
+        ["17:46","18:09"],["18:06","18:28"],["18:17","18:41"],["18:37","19:00"],["18:47","19:11"],
+        ["19:06","19:28"],["19:18","19:42"],["19:33","19:56"],["19:47","20:09"],["20:06","20:28"],
+        ["20:17","20:41"],["20:34","20:58"],["20:47","21:09",{f:["20:46","21:09"]}],["21:06","21:28"],
+        ["21:17","21:46",{f:["21:21","21:46"]}]]
+  },
+  antibes: {
+    name:"Antibes", far:"Antibes", days:"week-end", flipAt:"15:00", weekend:true,
+    live:"https://www.sncf-connect.com/train/horaires/nice/cannes",
+    win:{ab:["08:00","10:00"], ba:["19:00","21:00"]},
+    ab:[["06:30","06:58"],["06:44","07:09"],["07:02","07:30"],["07:14","07:39"],["07:30","07:58"],
+        ["07:43","08:08"],["08:02","08:29"],["08:13","08:38"],["08:31","08:58"],["08:44","09:09"],
+        ["09:01","09:29"],["09:14","09:40"],["09:31","09:59"],["09:44","10:09"],["10:02","10:29"],
+        ["10:13","10:38"],["10:31","10:59"],["10:44","11:09"],["11:01","11:29"],["11:14","11:39"],
+        ["11:31","11:59"],["11:44","12:09"],["12:01","12:29"],["12:10","12:38"],["12:29","12:56",{q:1}],
+        ["12:46","13:12",{q:1}],["13:01","13:29",{q:1}],["13:14","13:39",{q:1}],["13:31","13:59",{q:1}],
+        ["13:43","14:07"],["14:00","14:28"],["14:14","14:39"],["14:31","14:59"],["14:43","15:08"],
+        ["15:02","15:29"],["15:14","15:39"],["15:31","15:59"],["15:43","16:08"],["16:00","16:28"],
+        ["16:16","16:42"],["16:29","16:56"],["16:44","17:09"],["17:02","17:30"],["17:13","17:39"],
+        ["17:32","17:59"],["17:44","18:09"],["18:02","18:29"],["18:12","18:38"],["18:31","18:59"],
+        ["18:44","19:09"],["19:04","19:31"],["19:14","19:39"],["19:31","19:59"],["19:45","20:12"],
+        ["19:59","20:26"],["20:12","20:38"],["20:31","20:59"],["20:44","21:09"],["21:01","21:29"],
+        ["21:12","21:38"],["21:31","21:59"],["21:49","22:15"]],
+    ba:[["15:34","16:02"],["15:55","16:19"],["16:05","16:32"],["16:26","16:50"],["16:33","16:59"],
+        ["16:55","17:20"],["17:05","17:32"],["17:25","17:50"],["17:34","18:02"],["17:55","18:20"],
+        ["18:05","18:32"],["18:26","18:50"],["18:33","18:59"],["18:55","19:19"],["19:05","19:32"],
+        ["19:26","19:51"],["19:33","19:59"],["19:55","20:20"],["20:06","20:32"],["20:26","20:51"],
+        ["20:33","20:59"],["20:50","21:15"],["21:00","21:27"],["21:30","21:56"],["21:37","22:04"],
+        ["21:56","22:22",{q:1}],["21:59","22:23",{q:1}],["22:53","23:18",{q:1}],["22:58","23:24",{q:1}],
+        ["23:01","23:27",{q:1}],["23:35","00:01",{q:1}],["23:55","00:20",{q:1}],["00:36","01:02",{q:1}],
+        ["00:56","01:21",{q:1}]]
+  }
+};
+// Minutes since 04:00 so that 00:36 sorts after 23:55
+const toMin = s => { const [h,m]=s.split(":").map(Number); return ((h<4?h+24:h)*60+m); };
+const nowMin = d => { const h=d.getHours(); return ((h<4?h+24:h)*60+d.getMinutes()); };
+const fmtIn = d => d<=0 ? "maintenant" : d<60 ? `dans ${d} min` : `dans ${Math.floor(d/60)} h ${String(d%60).padStart(2,"0")}`;
+const $ = id => document.getElementById(id);
+
+let route = null, dir = null, manualRoute = false, manualDir = false;
+try { $("showpast").checked = localStorage.getItem("showpast")==="1"; } catch(e){}
+
+function render(){
+  const now = new Date(), wd = now.getDay(), mins = nowMin(now);
+  const serviceDay = now.getHours()<4 ? (wd+6)%7 : wd; // after midnight, still "last night"
+  const weekend = serviceDay===0 || serviceDay===6;
+  $("clock").textContent = now.toTimeString().slice(0,5);
+  if(!manualRoute) route = weekend ? "antibes" : "monaco";
+  const R = ROUTES[route];
+  if(!manualDir) dir = mins < toMin(R.flipAt) ? "ab" : "ba";
+
+  $("r-monaco").setAttribute("aria-pressed", route==="monaco");
+  $("r-antibes").setAttribute("aria-pressed", route==="antibes");
+  $("b-ab").textContent = `Nice → ${R.far}`;
+  $("b-ba").textContent = `${R.far} → Nice`;
+  $("b-ab").setAttribute("aria-pressed", dir==="ab");
+  $("b-ba").setAttribute("aria-pressed", dir==="ba");
+  $("title").textContent = `Nice-Ville ⇄ ${R.name}`;
+  $("live").href = R.live;
+
+  const from = dir==="ab" ? "Nice-Ville" : R.far, to = dir==="ab" ? R.far : "Nice-Ville";
+  $("board-title").textContent = `Départs de ${from}`;
+  const list = R[dir].map(([d,a,o]) => (serviceDay===5 && o && o.f) ? [o.f[0],o.f[1],o] : [d,a,o||{}]);
+  const upcoming = list.filter(([d]) => toMin(d) >= mins);
+  const [w0,w1] = R.win[dir].map(toMin);
+
+  if(upcoming.length){
+    const [d,a,o] = upcoming[0];
+    $("h-label").textContent = `Prochain train · ${from} → ${to}`;
+    $("h-time").textContent = d;
+    $("h-in").textContent = fmtIn(toMin(d)-mins);
+    $("h-arr").textContent = `Arrivée ${to} ${a} · ${toMin(a)-toMin(d)} min${o.q?" · jour de circulation à vérifier":""}`;
+    $("h-then").innerHTML = upcoming.slice(1,4).map(([x]) => `<span>${x}</span>`).join("");
+  } else {
+    $("h-label").textContent = `${from} → ${to}`;
+    $("h-time").textContent = "Fini";
+    $("h-in").textContent = "plus de train dans la liste";
+    $("h-arr").textContent = route==="monaco" && dir==="ba" ? "Après 21h21 : vérifie sur SNCF Connect (travaux de nuit)." : `Premier départ demain : ${list[0][0]}`;
+    $("h-then").innerHTML = "";
+  }
+
+  const show = $("showpast").checked, nextD = upcoming[0] && upcoming[0][0];
+  $("list").innerHTML = list.map(([d,a,o]) => {
+    const t = toMin(d), past = t < mins, next = d===nextD, win = t>=w0 && t<=w1;
+    const cls = [past?"past":"", past&&!show?"hide":"", next?"next":"", win?"win":""].join(" ");
+    const tags = (win?'<span class="tag">ton créneau</span>':'') + (o.q?'<span class="tag q">à vérifier</span>':'');
+    return `<li class="${cls}"><span class="dep tnum">${d}</span><span class="to tnum">→ ${to} ${a}${tags}</span><span class="in tnum">${past?"parti":fmtIn(t-mins)}</span></li>`;
+  }).join("");
+
+  const b = $("banner");
+  if(route==="monaco"){
+    const nightCut = serviceDay>=0 && serviceDay<=4;
+    b.className = "warn";
+    b.innerHTML = nightCut
+      ? `<strong>Travaux ce soir.</strong> Aucun train entre Nice et Vintimille de 22h à 6h (dimanche au jeudi soir, jusqu'au 11 décembre). Si tu rates le dernier, prends le bus ZOU 600 ou 601, accepté avec l'abonnement train ZOU.`
+      : `<strong>Vendredi et samedi soir :</strong> trains de nuit normaux. Du dimanche au jeudi, coupure de 22h à 6h jusqu'au 11 décembre.`;
+    $("daynote").textContent = weekend
+      ? "Week-end : cette grille est celle de la semaine. La plupart des trains roulent tous les jours, mais vérifie sur SNCF Connect."
+      : serviceDay===5 ? "Vendredi : les départs de 20h47 et 21h17 passent à 20h46 et 21h21." : "";
+  } else {
+    b.className = "warn info";
+    b.innerHTML = `<strong>Grille du week-end.</strong> Seuls les trains ZOU de la ligne 04 sont listés. Les TER Marseille–Nice s'arrêtent aussi à Antibes, il y a donc parfois un train de plus.`;
+    $("daynote").textContent = "« À vérifier » : la fiche ne dit pas clairement si ce train roule le samedi, le dimanche ou les deux.";
+  }
+}
+$("r-monaco").onclick = () => { manualRoute = true; manualDir = false; route = "monaco"; render(); };
+$("r-antibes").onclick = () => { manualRoute = true; manualDir = false; route = "antibes"; render(); };
+$("b-ab").onclick = () => { manualDir = true; dir = "ab"; render(); };
+$("b-ba").onclick = () => { manualDir = true; dir = "ba"; render(); };
+$("showpast").onchange = () => { try{ localStorage.setItem("showpast", $("showpast").checked?"1":"0"); }catch(e){} render(); };
+render();
+setInterval(render, 20000);
+document.addEventListener("visibilitychange", () => { if(!document.hidden) render(); });
+</script>
+
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}</script>
+</body>
+</html>
