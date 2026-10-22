@@ -15,7 +15,7 @@
 :root{
   --bg:#f3f5f8; --surface:#ffffff; --ink:#14213a; --muted:#5d6a80; --line:#dde2ea;
   --accent:#e8a317; --accent-ink:#3a2a00; --soon:#c2410c; --gone:#a8b1c0; --win:#fff6dc; --sea:#0e7490;
-  --bad:#b91c1c; --good:#15803d;
+  --bad:#b91c1c; --good:#15803d; --on-good:#ffffff;
   --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
   color-scheme:light;
@@ -24,7 +24,7 @@
 @media (prefers-color-scheme: dark){:root{
   --bg:#0d1424; --surface:#151f34; --ink:#e7ecf5; --muted:#93a0b8; --line:#26324b;
   --accent:#f2b531; --accent-ink:#2a1e00; --soon:#fb8a4c; --gone:#4c5874; --win:#2a2410; --sea:#38bdf8;
-  --bad:#f87171; --good:#4ade80; color-scheme:dark}}
+  --bad:#f87171; --good:#4ade80; --on-good:#052e16; color-scheme:dark}}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;
@@ -53,7 +53,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{ou
 .big{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .big .t{font-family:var(--f-display);font-weight:700;font-size:4.2rem;line-height:1}
 .big .t s{font-size:2rem;opacity:.55;margin-right:8px}
-.pill{font:700 1rem var(--f-display);letter-spacing:.03em;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 12px}
+.pill{font:700 1rem var(--f-display);letter-spacing:.03em;background:var(--good);color:var(--on-good);border-radius:999px;padding:4px 12px}
 .pill.bad{background:var(--bad);color:#fff}
 .arr{font-size:1rem;opacity:.85}
 .then{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
@@ -76,8 +76,7 @@ ol{list-style:none;margin:0;padding:0}
 .dep s{font-size:.95rem;font-weight:500;color:var(--muted)}
 .to{color:var(--muted);font-size:.92rem;min-width:0}
 .in{font:600 .95rem var(--f-display);color:var(--muted);text-align:right}
-#list li.win{background:var(--win)}
-#list li.next .in,#list li.next .dep{color:var(--soon)}
+#list li.next .in,#list li.next .dep{color:var(--good)}
 #list li.past{color:var(--gone)} #list li.past .to,#list li.past .in{color:var(--gone)}
 #list li.hide{display:none}
 #list li.cancel .dep{color:var(--bad);text-decoration:line-through}
@@ -154,6 +153,23 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
 .trophy{background:var(--ink);color:var(--bg);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:4px}
 .trophy .who{font:700 2rem var(--f-display)}
 .rules{font-size:.86rem;color:var(--muted);margin:0;padding-left:18px}
+.pick{display:flex;flex-direction:column;gap:8px}
+.pick h3{font:700 .95rem var(--f-display);letter-spacing:.05em;text-transform:uppercase;margin:0;color:var(--muted)}
+.trainpick{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.trainpick button{flex:none;font:700 1.15rem var(--f-display);border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;padding:8px 12px;cursor:pointer}
+.trainpick button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tiers{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.tiers button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:10px 12px;cursor:pointer;font:600 1rem var(--f-body)}
+.tiers button small{font-weight:400;color:var(--muted);font-size:.8rem}
+.tiers button b{font:700 1.2rem var(--f-display);color:var(--sea)}
+.tiers button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.tiers button:disabled{cursor:default;opacity:.55}
+.mybet{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;padding:12px;border-radius:12px;background:var(--bg);border:1px dashed var(--line)}
+.mybet b{font:700 1.2rem var(--f-display)}
+.res-ok{color:var(--good);font-weight:700} .res-ko{color:var(--bad);font-weight:700}
+.check{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;font-size:.95rem}
+.check input{width:22px;height:22px;margin-top:1px;flex:none;accent-color:var(--ink)}
+.check small{display:block;color:var(--muted)}
 /* Premier lancement */
 .setup{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;
   padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
@@ -176,12 +192,13 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
       <button type="button" data-st="riquier">Nice-Riquier <small>port, est</small></button>
       <button type="button" data-st="staug">Nice-St-Augustin <small>ouest, aéroport</small></button>
     </div>
+    <label class="check"><input type="checkbox" id="use-antibes"><span>Je vais aussi à Antibes<small>Ajoute les trajets Nice ⇄ Antibes et Monaco → Antibes.</small></span></label>
     <div class="walkset">
       <h3>Temps pour rejoindre la gare</h3>
       <p class="note">Le grand affichage saute les trains que tu n'as plus le temps d'attraper.</p>
       <div class="wrow"><span>Monaco, depuis le bureau</span><div class="step" data-w="monaco"><button type="button" data-d="-1" aria-label="Moins">−</button><output>15 min</output><button type="button" data-d="1" aria-label="Plus">+</button></div></div>
       <div class="wrow"><span id="w-nice-label">Ta gare de Nice</span><div class="step" data-w="nice"><button type="button" data-d="-1" aria-label="Moins">−</button><output>0 min</output><button type="button" data-d="1" aria-label="Plus">+</button></div></div>
-      <div class="wrow"><span>Antibes, depuis le club</span><div class="step" data-w="antibes"><button type="button" data-d="-1" aria-label="Moins">−</button><output>0 min</output><button type="button" data-d="1" aria-label="Plus">+</button></div></div>
+      <div class="wrow" id="w-antibes-row"><span>Antibes, depuis le club</span><div class="step" data-w="antibes"><button type="button" data-d="-1" aria-label="Moins">−</button><output>0 min</output><button type="button" data-d="1" aria-label="Plus">+</button></div></div>
     </div>
     <button class="btn" id="setup-done" type="button">C'est parti</button>
   </div>
@@ -204,6 +221,7 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
     <div class="routes" role="group" aria-label="Trajet">
       <button id="r-monaco" type="button" aria-pressed="false">Monaco <small>semaine</small></button>
       <button id="r-antibes" type="button" aria-pressed="false">Antibes <small>week-end</small></button>
+      <button id="r-monant" type="button" aria-pressed="false">Monaco → Antibes</button>
     </div>
     <div class="dir" role="group" aria-label="Sens du trajet">
       <button id="b-ab" type="button" aria-pressed="false">→</button>
@@ -239,7 +257,7 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
     </div>
     <div class="map-card" id="map-card" hidden></div>
     <div class="running" id="running"></div>
-    <div class="legend"><span><i class="o"></i>Train</span><span><i class="o" style="background:none;border:2px solid #fb8a4c;width:12px;height:12px"></i>Retard de 5 min ou plus</span><span><i class="tn"></i>Voie en tunnel</span></div>
+    <div class="legend"><span><i class="o"></i>Train (la pointe indique le sens)</span><span><i class="o" style="background:#fb8a4c"></i>Retard de 5 min ou plus</span><span><i class="tn"></i>Voie en tunnel</span></div>
     <p class="note" id="map-note">Position estimée à partir des horaires et du retard en direct : la SNCF ne publie pas le GPS des trains.</p>
   </section>
 
@@ -258,7 +276,6 @@ const API_BASE = "https://trains-api.canatole-calloch.workers.dev";
 const ROUTES = {
   monaco: {
     name:"Monaco", far:"monaco", flipAt:"13:00",
-    win:{ab:["07:30","08:30"], ba:["18:30","19:10"]},
     ab:[["06:24","06:51"],["06:53","07:18"],["07:02","07:28"],["07:22","07:48"],["07:34","08:00"],
         ["07:51","08:21"],["08:03","08:28"],["08:22","08:48"],["08:34","08:59"],["08:53","09:18"],
         ["09:02","09:27"],["09:23","09:50"],["09:34","09:59"],["09:54","10:20"]],
@@ -270,7 +287,6 @@ const ROUTES = {
   },
   antibes: {
     name:"Antibes", far:"antibes", flipAt:"15:00",
-    win:{ab:["08:00","10:00"], ba:["19:00","21:00"]},
     ab:[["06:30","06:58"],["06:44","07:09"],["07:02","07:30"],["07:14","07:39"],["07:30","07:58"],
         ["07:43","08:08"],["08:02","08:29"],["08:13","08:38"],["08:31","08:58"],["08:44","09:09"],
         ["09:01","09:29"],["09:14","09:40"],["09:31","09:59"],["09:44","10:09"],["10:02","10:29"],
@@ -294,6 +310,12 @@ const ROUTES = {
         ["00:56","01:21",{q:1}]]
   }
 };
+const _tm = s => { const [h,m]=s.split(":").map(Number); return (h<4?h+24:h)*60+m; };
+ROUTES.monant = { name:"Antibes", far:"antibes", from:"monaco", oneWay:true, flipAt:"00:00",
+  ab: ROUTES.monaco.ba.map(([d,a,o]) => {
+    const n = ROUTES.antibes.ab.find(([nd]) => _tm(nd) >= _tm(a) + 2);
+    return n ? [d, n[1], {...(o||{}), f: o && o.f ? [o.f[0], n[1]] : undefined, via:1}] : null;
+  }).filter(Boolean) };
 const LABEL = {ville:"Nice-Ville", riquier:"Nice-Riquier", staug:"Nice-St-Augustin", monaco:"Monaco", antibes:"Antibes"};
 // Décalage approximatif (minutes) par rapport à Nice-Ville, pour la grille hors ligne
 const OFFS = {
@@ -333,7 +355,8 @@ let boards = store.get("boards", {});        // dernières réponses temps réel
 let lastFetch = {}, fetching = {};
 $("showpast").checked = !!store.get("showpast", false);
 
-function legKey(){ const R = ROUTES[route]; return dir==="ab" ? [station, R.far] : [R.far, station]; }
+function legKey(){ const R = ROUTES[route]; if(R.oneWay) return [R.from, R.far]; return dir==="ab" ? [station, R.far] : [R.far, station]; }
+let useAntibes = !!store.get("antibes", false);
 
 // ---------- premier lancement ----------
 let walk = Object.assign({monaco:15, nice:0, antibes:0}, store.get("walk", {}));
@@ -346,6 +369,7 @@ function paintSetup(){
   document.querySelectorAll(".step").forEach(el => el.querySelector("output").textContent = `${walk[el.dataset.w]} min`);
   $("w-nice-label").textContent = station ? `${LABEL[station]}, depuis chez toi` : "Ta gare de Nice, depuis chez toi";
   $("setup-done").disabled = !station; $("setup-done").style.opacity = station ? 1 : .4;
+  $("use-antibes").checked = useAntibes; $("w-antibes-row").hidden = !useAntibes;
 }
 document.querySelectorAll("#stations button").forEach(b => b.onclick = () => { station = b.dataset.st; store.set("station", station); paintSetup(); });
 document.querySelectorAll(".step button").forEach(b => b.onclick = () => {
@@ -354,6 +378,7 @@ document.querySelectorAll(".step button").forEach(b => b.onclick = () => {
 });
 $("setup-done").onclick = () => { if(!station) return; $("setup").hidden = true; render(); refresh(true); MAP.redraw(); };
 $("gear").onclick = openSetup;
+$("use-antibes").onchange = () => { useAntibes = $("use-antibes").checked; store.set("antibes", useAntibes); if(!useAntibes && route!=="monaco"){ route="monaco"; manualRoute=false; } paintSetup(); render(); };
 
 // ---------- temps réel ----------
 async function refresh(force){
@@ -377,15 +402,20 @@ function render(){
   const sDay = now.getHours()<4 ? (wd+6)%7 : wd, weekend = sDay===0 || sDay===6;
   $("clock").textContent = now.toTimeString().slice(0,5);
   if(!station){ openSetup(); return; }
-  if(!manualRoute) route = weekend ? "antibes" : "monaco";
+  if(!useAntibes && route !== "monaco") { route = "monaco"; manualRoute = false; }
+  if(!manualRoute) route = (weekend && useAntibes) ? "antibes" : "monaco";
   const R = ROUTES[route];
-  if(!manualDir) dir = mins < toMin(R.flipAt) ? "ab" : "ba";
+  if(R.oneWay) dir = "ab";
+  else if(!manualDir) dir = mins < toMin(R.flipAt) ? "ab" : "ba";
   const [from, to] = legKey();
   const fromL = LABEL[from], toL = LABEL[to];
 
-  $("title").textContent = `${LABEL[station]} ⇄ ${R.name}`;
+  $("title").textContent = R.oneWay ? `Monaco → Antibes` : `${LABEL[station]} ⇄ ${R.name}`;
   $("r-monaco").setAttribute("aria-pressed", route==="monaco");
   $("r-antibes").setAttribute("aria-pressed", route==="antibes");
+  $("r-monant").setAttribute("aria-pressed", route==="monant");
+  document.querySelector(".routes").hidden = !useAntibes;
+  document.querySelector(".dir").hidden = !!R.oneWay;
   $("b-ab").textContent = `${short(station)} → ${R.name}`;
   $("b-ba").textContent = `${R.name} → ${short(station)}`;
   $("b-ab").setAttribute("aria-pressed", dir==="ab");
@@ -399,9 +429,9 @@ function render(){
   if(useLive){
     list = live.trains.map(t => ({num:t.num, dep:t.dep, arr:t.arr, depRt:t.depRt, arrRt:t.arrRt, delay:t.delay, status:t.status, mode:t.mode}));
   } else {
-    const off = OFFS[route][dir][station] || 0, approx = station !== "ville";
+    const off = R.oneWay ? 0 : (OFFS[route][dir][station] || 0), approx = !R.oneWay && station !== "ville";
     list = R[dir].map(([d,a,o]) => { o=o||{}; if(sDay===5 && o.f){ [d,a]=o.f; }
-      return dir==="ab" ? {dep:shift(d,off), arr:a, q:o.q, approx} : {dep:d, arr:shift(a,off), q:o.q, approx}; });
+      return dir==="ab" ? {dep:shift(d,off), arr:a, q:o.q, approx, via:o.via} : {dep:d, arr:shift(a,off), q:o.q, approx}; });
   }
   const eff = t => t.depRt || t.dep;
   const ok = list.filter(t => t.status !== "cancelled");
@@ -426,7 +456,7 @@ function render(){
     $("h-in").textContent = fmtIn(toMin(e)-mins);
     $("h-in").className = "pill tnum" + (t.delay>=5 ? " bad" : "");
     const a = t.arrRt || t.arr;
-    $("h-arr").textContent = `Arrivée ${toL} ${a}` + (t.delay>0 ? ` · retard ${t.delay} min` : "") + (t.approx ? " · heure approx." : "") + (t.q ? " · jour à vérifier" : "") + (t.mode && t.mode!=="TER" ? ` · ${t.mode}` : "");
+    $("h-arr").textContent = `Arrivée ${toL} ${a}` + (t.delay>0 ? ` · retard ${t.delay} min` : "") + (t.approx ? " · heure approx." : "") + (t.via ? " · changement possible à Nice" : "") + (t.q ? " · jour à vérifier" : "") + (t.mode && t.mode!=="TER" ? ` · ${t.mode}` : "");
     const tl = [...tight];
     $("h-then").innerHTML = catchable.slice(1,4).map(x => `<span>${eff(x)}${x.delay>=5?" ⚠":""}</span>`).join("")
       + (tl.length ? `<span class="walk" style="border-style:dashed">trop juste : ${tl.map(eff).join(", ")}</span>` : "");
@@ -434,23 +464,21 @@ function render(){
     $("h-label").textContent = `${fromL} → ${toL}`;
     $("h-time").textContent = "Fini";
     $("h-in").textContent = "plus de train attrapable"; $("h-in").className = "pill tnum";
-    $("h-arr").textContent = route==="monaco" ? "Vérifie sur SNCF Connect (travaux de nuit)." : "";
+    $("h-arr").textContent = route!=="antibes" ? "Vérifie sur SNCF Connect (travaux de nuit)." : "";
     $("h-then").innerHTML = "";
   }
 
   // Liste
   const show = $("showpast").checked, next = catchable[0];
-  const [w0,w1] = R.win[dir].map(toMin);
   $("list").innerHTML = list.map(t => {
-    const e = eff(t), tm = toMin(e), past = tm < mins, isNext = t===next, win = toMin(t.dep)>=w0 && toMin(t.dep)<=w1;
+    const e = eff(t), tm = toMin(e), past = tm < mins, isNext = t===next;
     const cancel = t.status === "cancelled", isTight = tight.has(t);
-    const cls = [past?"past":"", past&&!show?"hide":"", isNext?"next":"", win?"win":"", cancel?"cancel":"", isTight?"tight":""].join(" ");
+    const cls = [past?"past":"", past&&!show?"hide":"", isNext?"next":"", cancel?"cancel":"", isTight?"tight":""].join(" ");
     let tags = "";
     if(cancel) tags += '<span class="tag bad">supprimé</span>';
     else if(t.delay>0) tags += `<span class="tag late">+${t.delay} min</span>`;
     if(isTight) tags += `<span class="tag tight">trop juste</span>`;
     if(t.mode && t.mode!=="TER") tags += `<span class="tag q">${esc(t.mode)}</span>`;
-    if(win && !cancel && !isTight) tags += '<span class="tag">ton créneau</span>';
     if(t.q) tags += '<span class="tag q">à vérifier</span>';
     const depHtml = (t.delay>0 && t.depRt && !cancel) ? `${e}<s>${t.dep}</s>` : (t.approx ? "≈"+t.dep : t.dep);
     const right = cancel ? "" : past ? "parti" : fmtIn(tm-mins);
@@ -459,7 +487,7 @@ function render(){
 
   // Bandeau
   const b = $("banner");
-  if(route==="monaco"){
+  if(route!=="antibes"){
     const nightCut = sDay>=0 && sDay<=4;
     b.className = "warn";
     b.innerHTML = nightCut
@@ -471,7 +499,8 @@ function render(){
       : `<strong>Sans réseau :</strong> seuls les trains ZOU de la ligne 04 sont listés. Avec du réseau, l'app ajoute les TER Marseille–Nice et les autres trains.`;
   }
   const notes = [];
-  if(!useLive && station!=="ville") notes.push(`≈ : heure à ${LABEL[station]} estimée à partir de Nice-Ville (1 à 2 min près).`);
+  if(!useLive && R.oneWay) notes.push("Sans réseau : horaires reconstitués via Nice-Ville, certains trains demandent un changement à Nice.");
+  if(!useLive && !R.oneWay && station!=="ville") notes.push(`≈ : heure à ${LABEL[station]} estimée à partir de Nice-Ville (1 à 2 min près).`);
   if(!useLive && list.some(t=>t.q)) notes.push("« À vérifier » : la fiche ne dit pas clairement si ce train roule le samedi, le dimanche ou les deux.");
   $("daynote").textContent = notes.join(" ");
 }
@@ -479,6 +508,7 @@ const short = s => s==="ville" ? "Nice" : s==="riquier" ? "Riquier" : "St-August
 
 $("r-monaco").onclick = () => { manualRoute=true; manualDir=false; route="monaco"; render(); refresh(); };
 $("r-antibes").onclick = () => { manualRoute=true; manualDir=false; route="antibes"; render(); refresh(); };
+$("r-monant").onclick = () => { manualRoute=true; manualDir=false; route="monant"; render(); refresh(); };
 $("b-ab").onclick = () => { manualDir=true; dir="ab"; render(); refresh(); };
 $("b-ba").onclick = () => { manualDir=true; dir="ba"; render(); refresh(); };
 $("showpast").onchange = () => { store.set("showpast", $("showpast").checked); render(); };
@@ -500,13 +530,14 @@ $("tab-game").onclick = () => setTab("game");
 $("list").addEventListener("click", e => { const li = e.target.closest("li[data-num]"); if(li){ setTab("map"); MAP.select(li.dataset.num); } });
 
 // ---------- Paris ----------
-let gameData = null, gameErr = "", draft = {};
+let gameData = null, gameErr = "", pickTrain = null, busy = false;
 async function loadGame(){
   if(!API_BASE){ gameErr = "Les paris arrivent dès que le serveur est branché."; return renderGame(); }
   try{ gameData = await api("/api/game"); gameErr = ""; }
   catch(e){ gameErr = navigator.onLine ? e.message : "Pas de réseau. Les paris reviennent dès que tu captes."; }
   renderGame();
 }
+const tierName = (g, i) => i === null || i === undefined ? "pas de résultat" : g.tiers[i].label + (g.tiers[i].sub ? ` (${g.tiers[i].sub})` : "");
 function renderGame(){
   const el = $("game");
   const token = store.get("token");
@@ -527,45 +558,48 @@ function renderGame(){
     return;
   }
   if(gameErr || !gameData){ el.innerHTML = `<div class="card"><p class="note">${esc(gameErr || "Chargement…")}</p></div>`; return; }
-  const g = gameData, w = g.window;
+  const g = gameData, w = g.window, mine = g.myBet;
   const resBy = Object.fromEntries((g.results||[]).map(r => [r.train, r]));
   let html = "";
 
-  // Gagnant de la semaine, le vendredi
   if(g.isFriday && g.lastWeek.rows.length){
     const top = g.lastWeek.rows[0];
-    html += `<div class="trophy"><div class="eyebrow">Gagnant de la semaine</div><div class="who">${esc(top.name)}</div><div>${top.points} points · ${top.wins} paris gagnés</div></div>`;
+    html += `<div class="trophy"><div class="eyebrow">Gagnant de la semaine</div><div class="who">${esc(top.name)}</div><div>${top.points} points · ${top.wins} pari${top.wins>1?"s":""} gagné${top.wins>1?"s":""}</div></div>`;
   }
-  // Statut
-  const st = !w.weekday ? ["wait","Pas de paris le week-end"] : w.open ? ["open",`Paris ouverts jusqu'à ${w.closesAt}`]
-    : w.closed ? ["closed","Paris fermés · résultats après chaque départ"] : ["wait",`Ouverture à ${w.opensAt}`];
-  html += `<div class="card"><div class="status ${st[0]}">${st[1]}</div>
-    <p class="note">Joueur : <b>${esc(g.me ? g.me.name : store.get("name"))}</b>${w.weekday ? ` · ${g.myCount}/${g.rules.maxBets} paris aujourd'hui` : ""}</p>`;
 
-  if(w.weekday && g.trains.length){
-    html += `<div class="bets">`;
-    for(const t of g.trains){
-      const mine = g.bets.find(b => b.train===t.num && b.mine);
-      const others = g.bets.filter(b => b.train===t.num);
-      const res = resBy[t.num];
-      const resTxt = res ? (res.void ? "pas de résultat" : res.cancelled ? "supprimé" : res.delay>=g.rules.lateAt ? `+${res.delay} min` : res.delay>0 ? `+${res.delay} min (à l'heure)` : "à l'heure") : "";
-      html += `<div class="bet"><div class="bet-top"><span class="t tnum">${t.dep}</span><span class="note">Monaco → Nice${resTxt ? ` · <b>${resTxt}</b>` : t.status==="cancelled" ? " · supprimé" : ""}</span></div>`;
-      if(w.open && t.status!=="cancelled"){
-        const d = draft[t.num] || (mine ? {late:!!mine.late, minutes:mine.minutes||10} : null);
-        const late = d ? d.late : null;
-        html += `<div class="choice">
-          <button type="button" data-t="${t.num}" data-late="0" aria-pressed="${late===false}">À l'heure</button>
-          <button type="button" data-t="${t.num}" data-late="1" aria-pressed="${late===true}">En retard</button>
-          <button type="button" class="x" data-t="${t.num}" data-x="1" aria-label="Retirer le pari" ${mine?"":"hidden"}>✕</button></div>`;
-        if(late) html += `<div class="mins">Retard estimé <select data-t="${t.num}" class="m">${[5,6,7,8,10,12,15,20,25,30,45,60].map(m=>`<option value="${m}" ${(d.minutes||10)==m?"selected":""}>${m} min</option>`).join("")}</select></div>`;
-      } else if(others.length){
-        html += `<div class="who">${others.map(b => `<span class="chip${b.mine?" me":""}"><b>${esc(b.name)}</b> ${b.late?`retard ${b.minutes} min`:"à l'heure"}${b.settled?` · ${b.points} pts`:""}</span>`).join("")}</div>`;
-      }
-      html += `</div>`;
-    }
-    html += `</div>`;
-  } else if(w.weekday){
-    html += `<p class="note">Pas de train Monaco → Nice trouvé pour ce soir.</p>`;
+  const st = !w.weekday ? ["wait","Pas de paris le week-end"] : w.open ? ["open",`Pari ouvert jusqu'à ${w.closesAt.replace(":","h")}`] : ["closed","Paris fermés · résultat après le départ de chaque train"];
+  html += `<div class="card"><div class="status ${st[0]}">${st[1]}</div>
+    <p class="note">Joueur : <b>${esc(g.me ? g.me.name : store.get("name"))}</b>${w.weekday ? ` · ${g.count} pari${g.count>1?"s":""} aujourd'hui` : ""}</p>`;
+
+  if(mine){
+    const res = resBy[mine.train];
+    const out = mine.settled ? (mine.won ? `<span class="res-ok">Gagné · +${mine.points} pts</span>` : `<span class="res-ko">Perdu · c'était ${esc(tierName(g, mine.actual))}</span>`)
+      : res ? "" : `<span class="note">en attente du départ</span>`;
+    html += `<div class="mybet"><span>Ton pari : <b>${mine.dep}</b> · ${esc(tierName(g, mine.tier))} · ${mine.points} pts</span>${out}</div>`;
+  }
+
+  if(w.open && g.trains.length){
+    if(!pickTrain || !g.trains.some(t => t.num === pickTrain)) pickTrain = mine ? mine.train : null;
+    html += `<div class="pick"><h3>1 · Ton train Monaco → Nice</h3><div class="trainpick">${g.trains.map(t =>
+      `<button type="button" data-train="${esc(t.num)}" aria-pressed="${t.num===pickTrain}">${t.dep}</button>`).join("")}</div></div>`;
+    html += `<div class="pick"><h3>2 · Son retard au départ</h3><div class="tiers">${g.tiers.map((t,i) =>
+      `<button type="button" data-tier="${i}" ${pickTrain?"":"disabled"} aria-pressed="${!!mine && mine.train===pickTrain && mine.tier===i}"><span>${esc(t.label)}</span>${t.sub?`<small>${esc(t.sub)}</small>`:""}<b>${t.points} pts</b></button>`).join("")}</div>
+      <p class="note">${pickTrain ? "Touche un palier pour parier. Tu peux changer jusqu'à 14h." : "Choisis d'abord ton train."}</p></div>`;
+    if(mine) html += `<button class="btn ghost" id="g-remove" type="button">Retirer mon pari</button>`;
+  } else if(w.open){
+    html += `<p class="note">Pas de train Monaco → Nice trouvé entre 16h et 19h aujourd'hui.</p>`;
+  }
+
+  // Après 14h : les paris de tout le monde
+  if(w.closed && g.bets.length){
+    const byTrain = {};
+    for(const b of g.bets) (byTrain[b.dep + "|" + b.train] ||= []).push(b);
+    html += `<div class="bets">${Object.keys(byTrain).sort().map(k => {
+      const list = byTrain[k], [dep, num] = k.split("|"), r = resBy[num];
+      const rt = r ? (r.void ? "pas de résultat" : r.cancelled ? "supprimé" : r.delay > 0 ? `+${r.delay} min` : "à l'heure") : "";
+      return `<div class="bet"><div class="bet-top"><span class="t tnum">${dep}</span><span class="note">${rt ? `<b>${rt}</b>` : "pas encore parti"}</span></div>
+        <div class="who">${list.map(b => `<span class="chip${b.mine?" me":""}"><b>${esc(b.name)}</b> ${esc(g.tiers[b.tier].label)}${b.settled ? (b.won ? ` · +${b.points}` : " · 0") : ""}</span>`).join("")}</div></div>`;
+    }).join("")}</div>`;
   }
   html += `<p class="msg" id="g-msg"></p></div>`;
 
@@ -574,34 +608,29 @@ function renderGame(){
   html += `<div class="card"><h2>Classement de la semaine</h2><p class="note">Du ${fmtDate(g.week.start)} au ${fmtDate(g.week.end)}</p>`;
   html += rows.length ? rows.map((r,i) => `<div class="rank"><span class="n">${i+1}</span><span>${esc(r.name)} <span class="note">· ${r.wins}/${r.bets}</span></span><span class="p tnum">${r.points} pts</span></div>`).join("")
     : `<p class="note">Aucun point pour l'instant.</p>`;
-  html += `</div>${rulesHtml()}`;
+  html += `</div>${rulesHtml(g)}`;
   el.innerHTML = html;
 
-  el.querySelectorAll(".choice button").forEach(btn => btn.onclick = () => {
-    const n = btn.dataset.t;
-    if(btn.dataset.x){ delete draft[n]; return saveBet(n, null); }
-    const late = btn.dataset.late === "1";
-    const prev = draft[n] || {};
-    draft[n] = {late, minutes: prev.minutes || 10};
-    saveBet(n, draft[n]);
-  });
-  el.querySelectorAll("select.m").forEach(s => s.onchange = () => { draft[s.dataset.t] = {late:true, minutes:+s.value}; saveBet(s.dataset.t, draft[s.dataset.t]); });
+  el.querySelectorAll("[data-train]").forEach(b => b.onclick = () => { pickTrain = b.dataset.train; renderGame(); });
+  el.querySelectorAll("[data-tier]").forEach(b => b.onclick = () => { if(pickTrain) saveBet({train: pickTrain, tier: +b.dataset.tier}); });
+  const rm = $("g-remove"); if(rm) rm.onclick = () => saveBet({remove: true});
 }
-async function saveBet(train, d){
-  try{
-    await api("/api/bet", {method:"POST", body:JSON.stringify(d ? {train, late:d.late, minutes:d.minutes} : {train, remove:true})});
-    await loadGame();
-  }catch(e){ delete draft[train]; renderGame(); const m=$("g-msg"); if(m) m.textContent = e.message; }
+async function saveBet(body){
+  if(busy) return; busy = true;
+  try{ await api("/api/bet", {method:"POST", body:JSON.stringify(body)}); if(body.remove) pickTrain = null; await loadGame(); }
+  catch(e){ renderGame(); const m=$("g-msg"); if(m) m.textContent = e.message; }
+  finally{ busy = false; }
 }
 const fmtDate = s => { const [y,m,d] = s.split("-"); return `${+d}/${+m}`; };
-function rulesHtml(){
+function rulesHtml(g){
+  const n = g && g.stats ? g.stats.total : 0;
   return `<div class="card"><h2>Règles</h2><ul class="rules">
-    <li>En semaine, paris ouverts de 13h45 à 15h sur les trains Monaco → Nice de 16h à 21h30.</li>
-    <li>3 paris maximum par jour. Tu peux changer d'avis jusqu'à 15h.</li>
-    <li>Retard = départ de Monaco avec 5 min ou plus. Bon pronostic : 10 pts.</li>
-    <li>Bonus minutes si tu as dit « en retard » et qu'il l'est : 10 pts moins l'écart en minutes.</li>
-    <li>Train supprimé : 15 pts pour ceux qui avaient dit « en retard ».</li>
-    <li>Les paris des autres s'affichent après 15h. Semaine du vendredi au jeudi, gagnant annoncé le vendredi.</li>
+    <li>Un pari par jour, en semaine, avant 14h. Tu peux changer d'avis jusqu'à 14h.</li>
+    <li>Choisis ton train Monaco → Nice de l'après-midi (départs de 16h à 19h) et le palier de son retard au départ de Monaco.</li>
+    <li>Un train supprimé compte comme « plus de 2 h ».</li>
+    <li>Palier exact : tu gagnes les points affichés au moment du pari. Sinon : 0.</li>
+    <li>Plus un palier est rare, plus il rapporte. Les points se recalculent chaque vendredi d'après les vrais retards${n ? ` (${n} trains relevés)` : ""}.</li>
+    <li>Les paris des autres s'affichent après 14h. Semaine du vendredi au jeudi, gagnant annoncé le vendredi.</li>
   </ul></div>`;
 }
 
@@ -752,11 +781,12 @@ const MAP = (() => {
   function position(tr, now){
     const c = corridor(tr.stops, tr.delay||0);
     if(c.length < 2) return null;
+    const sgn = stDist[c[c.length-1].k] >= stDist[c[0].k] ? 1 : -1;   // +1 : vers Monaco, -1 : vers St-Augustin
     for(let i=0;i<c.length;i++){
-      if(now >= c[i].arr && now <= c[i].dep) return {d:stDist[c[i].k], at:c[i].k, next:c[i+1], dir:c[c.length-1].k};
+      if(now >= c[i].arr && now <= c[i].dep) return {d:stDist[c[i].k], at:c[i].k, next:c[i+1], dir:c[c.length-1].k, sgn, moving:false};
       if(i < c.length-1 && now > c[i].dep && now < c[i+1].arr){
         const f = (now - c[i].dep) / (c[i+1].arr - c[i].dep);
-        return {d: stDist[c[i].k] + f*(stDist[c[i+1].k]-stDist[c[i].k]), next:c[i+1], dir:c[c.length-1].k};
+        return {d: stDist[c[i].k] + f*(stDist[c[i+1].k]-stDist[c[i].k]), next:c[i+1], dir:c[c.length-1].k, sgn, moving:true};
       }
     }
     return null;
@@ -779,20 +809,56 @@ const MAP = (() => {
     const g = ctx; g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,cv.width,cv.height); g.drawImage(base,0,0);
     g.setTransform(dpr,0,0,dpr,0,0);
     const {live, trains} = running(); hits = [];
-    const pulse = (Math.sin(Date.now()/380)+1)/2;
+    const T = Date.now(), pulse = (Math.sin(T/380)+1)/2;
+    const maxD = TRACK[TRACK.length-1].d;
     for(const {tr,pos} of trains){
-      const pt = pointAt(pos.d), [sx,sy] = proj(pt.x,pt.y,pt.z), sel = selected===tr.num, late = (tr.delay||0) >= 5;
-      const col = "125,211,252";
+      const sel = selected===tr.num, late = (tr.delay||0) >= 5, sgn = pos.sgn;
+      const col = "125,211,252", hot = late ? "251,138,76" : col;
+      // Petit « élan » : le train oscille légèrement vers l'avant pour rendre le mouvement visible
+      const surge = pos.moving ? .12 * (Math.sin(T/260) + 1) : 0;
+      const d = Math.max(0, Math.min(maxD, pos.d + sgn*surge));
+      const pt = pointAt(d), [sx,sy] = proj(pt.x,pt.y,pt.z);
       g.save();
-      g.globalAlpha = pt.tun ? .6 : 1;
-      g.fillStyle = `rgba(${col},${.18 + .2*pulse})`; g.beginPath(); g.arc(sx,sy,(sel?16:11)+3*pulse,0,7); g.fill();
-      g.shadowColor = `rgb(${col})`; g.shadowBlur = 10; g.fillStyle = `rgb(${col})`; g.beginPath(); g.arc(sx,sy,sel?6.5:5,0,7); g.fill();
+      g.globalAlpha = pt.tun ? .7 : 1;
+      // Traînée derrière le train + tirets qui filent vers l'avant
+      if(pos.moving){
+        const tail = [];
+        for(let k=0;k<=14;k++){ const q = pointAt(Math.max(0, Math.min(maxD, d - sgn*(0.7 + k*0.16)))); tail.push(proj(q.x,q.y,q.z)); }
+        for(let k=1;k<tail.length;k++){
+          g.strokeStyle = `rgba(${hot},${.85*(1-k/tail.length)})`; g.lineWidth = 7*(1-k/tail.length)+1.5; g.lineCap = "round";
+          g.beginPath(); g.moveTo(tail[k-1][0],tail[k-1][1]); g.lineTo(tail[k][0],tail[k][1]); g.stroke();
+        }
+        const ahead = [];
+        for(let k=0;k<=8;k++){ const q = pointAt(Math.max(0, Math.min(maxD, d + sgn*(0.5 + k*0.14)))); ahead.push(proj(q.x,q.y,q.z)); }
+        g.setLineDash([3,5]); g.lineDashOffset = -(T/45) % 8; g.strokeStyle = `rgba(${hot},.75)`; g.lineWidth = 1.6;
+        g.beginPath(); ahead.forEach(([x,y],k) => k ? g.lineTo(x,y) : g.moveTo(x,y)); g.stroke(); g.setLineDash([]);
+      }
+      // Halo
+      g.fillStyle = `rgba(${hot},${.12 + .14*pulse})`; g.beginPath(); g.arc(sx,sy,(sel?18:13)+3*pulse,0,7); g.fill();
+      // Train en flèche 3D, orienté dans son sens de marche
+      const a = pointAt(Math.max(0, Math.min(maxD, d - sgn*0.3))), b = pointAt(Math.max(0, Math.min(maxD, d + sgn*0.3)));
+      let ux = b.x - a.x, uy = b.y - a.y; const ul = Math.hypot(ux,uy) || 1; ux /= ul; uy /= ul;
+      const vx = -uy, vy = ux, S = (sel ? 1.3 : 1) * (W < 520 ? 1.5 : 1.2);
+      const shape = [[-.85,-.24],[.1,-.24],[.1,-.44],[1,0],[.1,.44],[.1,.24],[-.85,.24]].map(([u,v]) => [pt.x + (u*ux + v*vx)*S, pt.y + (u*uy + v*vy)*S]);
+      const H = .16*S;
+      const bot = shape.map(([x,y]) => proj(x,y,pt.z)), top = shape.map(([x,y]) => proj(x,y,pt.z+H));
+      g.shadowColor = `rgb(${hot})`; g.shadowBlur = 12;
+      for(let k=0;k<shape.length;k++){                     // flancs
+        const k2 = (k+1)%shape.length;
+        g.fillStyle = `rgba(${hot},.55)`;
+        g.beginPath(); g.moveTo(bot[k][0],bot[k][1]); g.lineTo(bot[k2][0],bot[k2][1]); g.lineTo(top[k2][0],top[k2][1]); g.lineTo(top[k][0],top[k][1]); g.closePath(); g.fill();
+      }
       g.shadowBlur = 0;
-      if(late){ g.strokeStyle = "#fb8a4c"; g.lineWidth = 2; g.beginPath(); g.arc(sx,sy,sel?10:8.5,0,7); g.stroke(); }
-      if(sel){ g.strokeStyle = "#ffffff"; g.lineWidth = 1.5; g.beginPath(); g.arc(sx,sy,9+4*pulse,0,7); g.stroke(); }
+      g.fillStyle = `rgb(${hot})`;                          // dessus
+      g.beginPath(); top.forEach(([x,y],k) => k ? g.lineTo(x,y) : g.moveTo(x,y)); g.closePath(); g.fill();
+      g.strokeStyle = "rgba(255,255,255,.85)"; g.lineWidth = 1; g.stroke();
+      // Nez lumineux
+      g.fillStyle = "#ffffff"; g.beginPath(); g.arc(top[3][0], top[3][1], 1.8*S, 0, 7); g.fill();
+      if(sel){ g.strokeStyle = "#ffffff"; g.lineWidth = 1.5; g.beginPath(); g.arc(sx,sy,13+4*pulse,0,7); g.stroke(); }
       if(sel || trains.length <= 6 || W > 520){
         g.font = `700 ${sel?13:11}px "Barlow Condensed","Arial Narrow",sans-serif`; g.textAlign = "center";
-        const txt = (live ? tr.num : tr.stops[0].dep) + (tr.delay ? ` +${tr.delay}'` : "");
+        const core = (live ? tr.num : tr.stops[0].dep) + (tr.delay ? ` +${tr.delay}'` : "");
+        const txt = sgn > 0 ? core + " ▸" : "◂ " + core;
         const tw = g.measureText(txt).width + 10, ty = sy + (sy > H*.6 ? 22 : -16);
         g.fillStyle = "rgba(10,16,29,.85)"; g.beginPath(); g.roundRect(sx-tw/2, ty-11, tw, 15, 4); g.fill();
         g.fillStyle = late ? "#fb8a4c" : `rgb(${col})`; g.fillText(txt, sx, ty);
