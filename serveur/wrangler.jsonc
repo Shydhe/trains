@@ -1,0 +1,14 @@
+// Configuration du serveur trains-api (Cloudflare Worker).
+// Cloudflare lit ce fichier à chaque envoi sur GitHub et redéploie le serveur.
+// Les secrets (SNCF_KEY) et le code d'équipe (TEAM_CODE) restent dans le tableau de bord Cloudflare, jamais ici.
+{
+  "name": "trains-api",
+  "main": "worker.js",
+  "compatibility_date": "2026-10-22",
+  "keep_vars": true,
+  "d1_databases": [
+    { "binding": "DB", "database_name": "trains", "database_id": "eb691e36-c4cb-4911-9d31-fb2bde6a3fc3" }
+  ],
+  "triggers": { "crons": ["*/5 * * * 1-5"] },
+  "observability": { "enabled": true }
+}
