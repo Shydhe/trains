@@ -4,52 +4,63 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#14213a">
+<title>Trains Nice ZOU</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
-</head>
-<body>
-<title>Nice ⇄ Monaco ZOU</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Barlow:wght@400;500;600&display=swap">
 <style>
-/* Layout: one column "quai" board — route + direction, next train hero, then the full timetable as a scannable list */
+/* Layout: une colonne "quai" — onglets Trains / Paris, prochain train en gros, puis la liste */
 :root{
   --bg:#f3f5f8; --surface:#ffffff; --ink:#14213a; --muted:#5d6a80; --line:#dde2ea;
   --accent:#e8a317; --accent-ink:#3a2a00; --soon:#c2410c; --gone:#a8b1c0; --win:#fff6dc; --sea:#0e7490;
+  --bad:#b91c1c; --good:#15803d;
   --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"Barlow",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  color-scheme:light;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media (prefers-color-scheme: dark){:root{
   --bg:#0d1424; --surface:#151f34; --ink:#e7ecf5; --muted:#93a0b8; --line:#26324b;
-  --accent:#f2b531; --accent-ink:#2a1e00; --soon:#fb8a4c; --gone:#4c5874; --win:#2a2410; --sea:#38bdf8; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0d1424; --surface:#151f34; --ink:#e7ecf5; --muted:#93a0b8; --line:#26324b;
-  --accent:#f2b531; --accent-ink:#2a1e00; --soon:#fb8a4c; --gone:#4c5874; --win:#2a2410; --sea:#38bdf8; color-scheme:dark}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 40px}
+  --accent:#f2b531; --accent-ink:#2a1e00; --soon:#fb8a4c; --gone:#4c5874; --win:#2a2410; --sea:#38bdf8;
+  --bad:#f87171; --good:#4ade80; color-scheme:dark}}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px}
 .wrap{max-width:520px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
 .tnum{font-variant-numeric:tabular-nums}
-header{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
-h1{font-family:var(--f-display);font-weight:700;font-size:1.6rem;letter-spacing:.01em;margin:0;text-wrap:balance}
-.clock{font-family:var(--f-display);font-size:1.4rem;font-weight:600;color:var(--muted)}
+header{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.5rem;letter-spacing:.01em;margin:0;text-wrap:balance;min-width:0}
+.hright{display:flex;align-items:center;gap:10px}
+.clock{font-family:var(--f-display);font-size:1.35rem;font-weight:600;color:var(--muted)}
+.icon-btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;width:40px;height:40px;font-size:1.1rem;cursor:pointer}
+button{font-family:inherit}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tabs{display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:2px solid var(--line)}
+.tabs button{font:700 1.05rem var(--f-display);letter-spacing:.05em;text-transform:uppercase;background:none;border:0;padding:10px 0;color:var(--muted);cursor:pointer;margin-bottom:-2px;border-bottom:3px solid transparent}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
 .routes{display:flex;gap:8px;flex-wrap:wrap}
 .routes button{font:600 .95rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer;display:flex;gap:6px;align-items:baseline}
 .routes button small{font-weight:400;color:var(--muted);font-size:.8rem}
 .routes button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
 .dir{display:grid;grid-template-columns:1fr 1fr;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px}
-.dir button{font:600 1rem var(--f-display);letter-spacing:.03em;text-transform:uppercase;border:0;border-radius:9px;padding:12px 8px;background:transparent;color:var(--muted);cursor:pointer}
+.dir button{font:600 .98rem var(--f-display);letter-spacing:.03em;text-transform:uppercase;border:0;border-radius:9px;padding:12px 6px;background:transparent;color:var(--muted);cursor:pointer}
 .dir button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
-button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .hero{background:var(--ink);color:var(--bg);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:6px}
 .eyebrow{font:600 .78rem var(--f-body);letter-spacing:.12em;text-transform:uppercase;opacity:.75}
 .big{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .big .t{font-family:var(--f-display);font-weight:700;font-size:4.2rem;line-height:1}
+.big .t s{font-size:2rem;opacity:.55;margin-right:8px}
 .pill{font:700 1rem var(--f-display);letter-spacing:.03em;background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 12px}
+.pill.bad{background:var(--bad);color:#fff}
 .arr{font-size:1rem;opacity:.85}
 .then{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .then span{font:600 1.05rem var(--f-display);border:1px solid color-mix(in srgb,var(--bg) 35%,transparent);border-radius:8px;padding:4px 10px}
+.live{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--gone);flex:none}
+.dot.on{background:var(--good)} .dot.old{background:var(--accent)}
 .note{font-size:.88rem;color:var(--muted);margin:0}
 .warn{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--soon);border-radius:10px;padding:12px 14px;font-size:.92rem}
 .warn strong{color:var(--soon)}
@@ -59,72 +70,194 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(-
 .board-head h2{font:700 1.1rem var(--f-display);letter-spacing:.04em;text-transform:uppercase;margin:0}
 .toggle{font:500 .9rem var(--f-body);color:var(--muted);display:flex;gap:6px;align-items:center}
 ol{list-style:none;margin:0;padding:0}
-li{display:grid;grid-template-columns:4.2rem 1fr auto;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line)}
-li:last-child{border-bottom:0}
-li .dep{font:700 1.45rem var(--f-display)}
-li .to{color:var(--muted);font-size:.92rem;min-width:0}
-li .in{font:600 .95rem var(--f-display);color:var(--muted);text-align:right}
-li.win{background:var(--win)}
-li.next .in,li.next .dep{color:var(--soon)}
-li.past{color:var(--gone)} li.past .to,li.past .in{color:var(--gone)}
-li.hide{display:none}
-.tag{font:600 .7rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle;white-space:nowrap}
+#list li{display:grid;grid-template-columns:4.4rem 1fr auto;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line)}
+#list li:last-child{border-bottom:0}
+.dep{font:700 1.45rem var(--f-display);display:flex;flex-direction:column;line-height:1.05}
+.dep s{font-size:.95rem;font-weight:500;color:var(--muted)}
+.to{color:var(--muted);font-size:.92rem;min-width:0}
+.in{font:600 .95rem var(--f-display);color:var(--muted);text-align:right}
+#list li.win{background:var(--win)}
+#list li.next .in,#list li.next .dep{color:var(--soon)}
+#list li.past{color:var(--gone)} #list li.past .to,#list li.past .in{color:var(--gone)}
+#list li.hide{display:none}
+#list li.cancel .dep{color:var(--bad);text-decoration:line-through}
+#list li.tight .dep,#list li.tight .in{color:var(--gone)}
+#list li[data-num]{cursor:pointer}
+.tag.tight{background:transparent;color:var(--muted);border:1px dashed var(--gone)}
+.walk{font-size:.9rem;opacity:.8}
+/* Réglages */
+.walkset{display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.walkset h3{font:700 1.05rem var(--f-display);letter-spacing:.04em;text-transform:uppercase;margin:0}
+.wrow{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;font-size:.95rem}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:38px;height:38px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.2rem;cursor:pointer}
+.step output{font:700 1.2rem var(--f-display);min-width:3.6rem;text-align:center}
+/* Carte (univers nocturne volontaire, identique en thème clair et sombre) */
+#pane-map{gap:12px}
+.mapbox{position:relative;height:clamp(270px,52vw,470px);border-radius:16px;overflow:hidden;background:radial-gradient(130% 100% at 50% 0%,#1c2a47 0%,#0a101d 75%);border:1px solid #1d2a44}
+#map{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:pointer;touch-action:manipulation}
+.map-src{position:absolute;left:12px;top:10px;font:600 .72rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:#8fa3c4;pointer-events:none}
+.map-msg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;color:#c9d3e6;font-size:.95rem}
+.map-top{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:6px;flex-wrap:wrap;z-index:2;pointer-events:none}
+.map-top button{pointer-events:auto;font:600 .85rem var(--f-body);border-radius:999px;border:1px solid #2c3b5c;background:rgba(11,18,32,.82);color:#e7ecf5;padding:7px 12px;cursor:pointer;backdrop-filter:blur(6px)}
+.map-top button[aria-pressed="true"]{border-color:#f2b531;color:#f2b531}
+.map-card{position:relative;background:#0e1628;color:#e7ecf5;border:1px solid #2c3b5c;border-radius:14px;padding:12px 44px 12px 14px;display:flex;flex-direction:column;gap:4px}
+.map-card .t{font:700 1.4rem var(--f-display);display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.map-card .s{font-size:.9rem;color:#a9b5cc}
+.map-card .late{color:#fb8a4c} .map-card .ok{color:#4ade80}
+.map-card .close{position:absolute;top:8px;right:8px;background:none;border:0;color:#a9b5cc;font-size:1.1rem;cursor:pointer;width:32px;height:32px}
+.running{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.running button{flex:none;font:600 .92rem var(--f-body);border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:8px 12px;cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left}
+.running button small{font-weight:400;color:var(--muted);font-size:.78rem}
+.running button.mine{border-color:var(--accent)}
+.running button[aria-pressed="true"]{background:var(--ink);color:var(--bg)} .running button[aria-pressed="true"] small{color:var(--bg);opacity:.75}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.legend i.m{background:#f2b531} .legend i.o{background:#7dd3fc} .legend i.tn{width:16px;height:0;border-top:2px dashed #b88a2a;border-radius:0;vertical-align:3px}
+.tag{font:600 .7rem var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:middle;white-space:nowrap}
 .tag.q{background:transparent;color:var(--muted);border:1px solid var(--line)}
+.tag.late{background:var(--soon);color:#fff}
+.tag.bad{background:var(--bad);color:#fff}
 .links{display:flex;flex-direction:column;gap:8px}
 .links a{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:13px 16px;color:var(--ink);text-decoration:none;font-weight:600}
 .links a span{color:var(--muted);font-weight:400;font-size:.88rem;white-space:nowrap}
 footer{font-size:.8rem;color:var(--muted)}
+/* Paris */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card h2{font:700 1.15rem var(--f-display);letter-spacing:.04em;text-transform:uppercase;margin:0}
+.status{font:700 1.3rem var(--f-display);letter-spacing:.02em}
+.status.open{color:var(--good)} .status.wait{color:var(--muted)} .status.closed{color:var(--soon)}
+label.f{display:flex;flex-direction:column;gap:4px;font-size:.9rem;color:var(--muted)}
+input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+.btn{font:700 1rem var(--f-display);letter-spacing:.04em;text-transform:uppercase;border:0;border-radius:10px;padding:12px 16px;background:var(--ink);color:var(--bg);cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.msg{font-size:.9rem;color:var(--bad);margin:0}
+.bets{display:flex;flex-direction:column;gap:0}
+.bet{display:flex;flex-direction:column;gap:8px;padding:12px 0;border-top:1px solid var(--line)}
+.bet:first-child{border-top:0}
+.bet-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.bet-top .t{font:700 1.35rem var(--f-display)}
+.choice{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center}
+.choice button{font:600 .95rem var(--f-body);border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:9px 6px;cursor:pointer}
+.choice button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.choice button.x{width:40px;padding:9px 0;color:var(--muted)}
+.mins{display:flex;align-items:center;gap:8px;font-size:.92rem;color:var(--muted)}
+.mins select{width:auto}
+.who{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:.85rem;border:1px solid var(--line);border-radius:999px;padding:3px 10px;background:var(--bg)}
+.chip.me{border-color:var(--accent)}
+.chip b{font-weight:600}
+.rank{display:grid;grid-template-columns:2rem 1fr auto;gap:8px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line)}
+.rank:first-of-type{border-top:0}
+.rank .n{font:700 1.2rem var(--f-display);color:var(--muted)}
+.rank .p{font:700 1.2rem var(--f-display)}
+.trophy{background:var(--ink);color:var(--bg);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.trophy .who{font:700 2rem var(--f-display)}
+.rules{font-size:.86rem;color:var(--muted);margin:0;padding-left:18px}
+/* Premier lancement */
+.setup{position:fixed;inset:0;background:var(--bg);z-index:20;overflow:auto;
+  padding:calc(24px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) calc(24px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.setup .wrap{gap:18px}
+.setup h2{font:700 2rem var(--f-display);margin:0;text-wrap:balance}
+.stations{display:flex;flex-direction:column;gap:10px}
+.stations button{font:700 1.4rem var(--f-display);letter-spacing:.02em;text-align:left;padding:18px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.stations button small{font:400 .88rem var(--f-body);color:var(--muted)}
+.stations button[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent)}
 </style>
+</head>
+<body>
+
+<div class="setup" id="setup" hidden>
+  <div class="wrap">
+    <h2>D'où pars-tu le matin ?</h2>
+    <p class="note">Ta gare de Nice. Tu pourras la changer plus tard avec le bouton ⚙.</p>
+    <div class="stations" id="stations">
+      <button type="button" data-st="ville">Nice-Ville <small>centre</small></button>
+      <button type="button" data-st="riquier">Nice-Riquier <small>port, est</small></button>
+      <button type="button" data-st="staug">Nice-St-Augustin <small>ouest, aéroport</small></button>
+    </div>
+    <div class="walkset">
+      <h3>Temps pour rejoindre la gare</h3>
+      <p class="note">Le grand affichage saute les trains que tu n'as plus le temps d'attraper.</p>
+      <div class="wrow"><span>Monaco, depuis le bureau</span><div class="step" data-w="monaco"><button type="button" data-d="-1" aria-label="Moins">−</button><output>15 min</output><button type="button" data-d="1" aria-label="Plus">+</button></div></div>
+      <div class="wrow"><span id="w-nice-label">Ta gare de Nice</span><div class="step" data-w="nice"><button type="button" data-d="-1" aria-label="Moins">−</button><output>0 min</output><button type="button" data-d="1" aria-label="Plus">+</button></div></div>
+      <div class="wrow"><span>Antibes, depuis le club</span><div class="step" data-w="antibes"><button type="button" data-d="-1" aria-label="Moins">−</button><output>0 min</output><button type="button" data-d="1" aria-label="Plus">+</button></div></div>
+    </div>
+    <button class="btn" id="setup-done" type="button">C'est parti</button>
+  </div>
+</div>
 
 <div class="wrap">
   <header>
-    <h1 id="title">Nice-Ville ⇄ Monaco</h1>
-    <div class="clock tnum" id="clock">--:--</div>
+    <h1 id="title">Trains</h1>
+    <div class="hright"><div class="clock tnum" id="clock">--:--</div><button class="icon-btn" id="gear" type="button" aria-label="Changer de gare">⚙</button></div>
   </header>
 
-  <div class="routes" role="group" aria-label="Trajet">
-    <button id="r-monaco" type="button" aria-pressed="false">Monaco <small>semaine</small></button>
-    <button id="r-antibes" type="button" aria-pressed="false">Antibes <small>week-end</small></button>
+  <div class="tabs" role="tablist">
+    <button id="tab-trains" role="tab" aria-selected="true" type="button">Trains</button>
+    <button id="tab-map" role="tab" aria-selected="false" type="button">Carte</button>
+    <button id="tab-game" role="tab" aria-selected="false" type="button">Paris</button>
   </div>
 
-  <div class="dir" role="group" aria-label="Sens du trajet">
-    <button id="b-ab" type="button" aria-pressed="false">Nice →</button>
-    <button id="b-ba" type="button" aria-pressed="false">→ Nice</button>
-  </div>
-
-  <section class="hero" aria-live="polite">
-    <div class="eyebrow" id="h-label">Prochain train</div>
-    <div class="big"><span class="t tnum" id="h-time">--:--</span><span class="pill tnum" id="h-in">…</span></div>
-    <div class="arr tnum" id="h-arr"></div>
-    <div class="then tnum" id="h-then"></div>
-  </section>
-
-  <div class="warn" id="banner"></div>
-
-  <section class="board">
-    <div class="board-head">
-      <h2 id="board-title">Départs</h2>
-      <label class="toggle"><input type="checkbox" id="showpast"> Trains passés</label>
+  <!-- TRAINS -->
+  <section id="pane-trains" style="display:flex;flex-direction:column;gap:14px">
+    <div class="routes" role="group" aria-label="Trajet">
+      <button id="r-monaco" type="button" aria-pressed="false">Monaco <small>semaine</small></button>
+      <button id="r-antibes" type="button" aria-pressed="false">Antibes <small>week-end</small></button>
     </div>
-    <ol id="list"></ol>
+    <div class="dir" role="group" aria-label="Sens du trajet">
+      <button id="b-ab" type="button" aria-pressed="false">→</button>
+      <button id="b-ba" type="button" aria-pressed="false">←</button>
+    </div>
+    <section class="hero" aria-live="polite">
+      <div class="eyebrow" id="h-label">Prochain train</div>
+      <div class="big"><span class="t tnum" id="h-time">--:--</span><span class="pill tnum" id="h-in">…</span></div>
+      <div class="arr tnum" id="h-arr"></div>
+      <div class="then tnum" id="h-then"></div>
+    </section>
+    <div class="live" id="live"><span class="dot" id="dot"></span><span id="live-txt">Horaires théoriques</span></div>
+    <div class="warn" id="banner"></div>
+    <section class="board">
+      <div class="board-head">
+        <h2 id="board-title">Départs</h2>
+        <label class="toggle"><input type="checkbox" id="showpast"> Trains passés</label>
+      </div>
+      <ol id="list"></ol>
+    </section>
+    <p class="note" id="daynote"></p>
+    <div class="links">
+      <a id="sncf" href="https://www.sncf-connect.com/" target="_blank" rel="noopener">Ouvrir SNCF Connect <span>↗</span></a>
+    </div>
+    <footer id="foot">Sans réseau : grille ZOU ligne 04 (version du 7 juillet 2026), valable jusqu'au 12 décembre 2026. Avec réseau : tous les trains sauf TGV inOui, en temps réel.</footer>
   </section>
 
-  <p class="note" id="daynote"></p>
+  <!-- CARTE -->
+  <section id="pane-map" hidden style="flex-direction:column">
+    <div class="mapbox">
+      <canvas id="map" aria-label="Carte de la côte de Nice-St-Augustin à Monaco avec les trains en circulation"></canvas>
+      <div class="map-src" id="map-src"></div>
+    </div>
+    <div class="map-card" id="map-card" hidden></div>
+    <div class="running" id="running"></div>
+    <div class="legend"><span><i class="o"></i>Train</span><span><i class="o" style="background:none;border:2px solid #fb8a4c;width:12px;height:12px"></i>Retard de 5 min ou plus</span><span><i class="tn"></i>Voie en tunnel</span></div>
+    <p class="note" id="map-note">Position estimée à partir des horaires et du retard en direct : la SNCF ne publie pas le GPS des trains.</p>
+  </section>
 
-  <div class="links">
-    <a id="live" href="https://www.sncf-connect.com/train/horaires/nice/vintimille" target="_blank" rel="noopener">Vérifier les retards en direct <span>SNCF Connect ↗</span></a>
-    <a href="https://www.ter.sncf.com/sud-provence-alpes-cote-d-azur/se-deplacer/info-trafic/travaux/travaux-entre-nice-vintimille" target="_blank" rel="noopener">Travaux Nice–Vintimille <span>TER Sud ↗</span></a>
-  </div>
-
-  <footer>Horaires théoriques de la fiche ZOU ligne 04 (version du 7 juillet 2026), valables jusqu'au 12 décembre 2026. Ils ne montrent ni les retards ni les suppressions.</footer>
+  <!-- PARIS -->
+  <section id="pane-game" hidden style="flex-direction:column;gap:14px">
+    <div id="game"></div>
+  </section>
 </div>
 
 <script>
-// Fiche horaire ZOU 04 (V4.1, 07/07/2026). Options: f = Friday variant, q = day of service to check.
+// ====== À REMPLIR : l'adresse de ton serveur Cloudflare (sans / à la fin) ======
+const API_BASE = "https://trains-api.canatole-calloch.workers.dev";
+// ================================================================================
+
+// Grille ZOU 04 hors ligne, au départ / à l'arrivée de Nice-Ville. f = variante du vendredi, q = jour à vérifier.
 const ROUTES = {
   monaco: {
-    name:"Monaco", far:"Monaco", days:"semaine", flipAt:"13:00", weekend:false,
-    live:"https://www.sncf-connect.com/train/horaires/nice/vintimille",
+    name:"Monaco", far:"monaco", flipAt:"13:00",
     win:{ab:["07:30","08:30"], ba:["18:30","19:10"]},
     ab:[["06:24","06:51"],["06:53","07:18"],["07:02","07:28"],["07:22","07:48"],["07:34","08:00"],
         ["07:51","08:21"],["08:03","08:28"],["08:22","08:48"],["08:34","08:59"],["08:53","09:18"],
@@ -136,8 +269,7 @@ const ROUTES = {
         ["21:17","21:46",{f:["21:21","21:46"]}]]
   },
   antibes: {
-    name:"Antibes", far:"Antibes", days:"week-end", flipAt:"15:00", weekend:true,
-    live:"https://www.sncf-connect.com/train/horaires/nice/cannes",
+    name:"Antibes", far:"antibes", flipAt:"15:00",
     win:{ab:["08:00","10:00"], ba:["19:00","21:00"]},
     ab:[["06:30","06:58"],["06:44","07:09"],["07:02","07:30"],["07:14","07:39"],["07:30","07:58"],
         ["07:43","08:08"],["08:02","08:29"],["08:13","08:38"],["08:31","08:58"],["08:44","09:09"],
@@ -162,88 +294,580 @@ const ROUTES = {
         ["00:56","01:21",{q:1}]]
   }
 };
-// Minutes since 04:00 so that 00:36 sorts after 23:55
-const toMin = s => { const [h,m]=s.split(":").map(Number); return ((h<4?h+24:h)*60+m); };
-const nowMin = d => { const h=d.getHours(); return ((h<4?h+24:h)*60+d.getMinutes()); };
-const fmtIn = d => d<=0 ? "maintenant" : d<60 ? `dans ${d} min` : `dans ${Math.floor(d/60)} h ${String(d%60).padStart(2,"0")}`;
+const LABEL = {ville:"Nice-Ville", riquier:"Nice-Riquier", staug:"Nice-St-Augustin", monaco:"Monaco", antibes:"Antibes"};
+// Décalage approximatif (minutes) par rapport à Nice-Ville, pour la grille hors ligne
+const OFFS = {
+  monaco:{ab:{ville:0,riquier:5,staug:-10}, ba:{ville:0,riquier:-4,staug:10}},
+  antibes:{ab:{ville:0,riquier:-5,staug:9}, ba:{ville:0,riquier:4,staug:-9}}
+};
+
+// ---------- utilitaires ----------
 const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k, d=null){ try{ const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const toMin = s => { const [h,m]=s.split(":").map(Number); return (h<4?h+24:h)*60+m; };
+const fromMin = t => { t=((t%1440)+1440)%1440; return `${String(Math.floor(t/60)).padStart(2,"0")}:${String(t%60).padStart(2,"0")}`; };
+const shift = (hm, m) => m ? fromMin(toMin(hm)+m) : hm;
+const nowMin = d => { const h=d.getHours(); return (h<4?h+24:h)*60+d.getMinutes(); };
+const fmtIn = d => d<=0 ? "maintenant" : d<60 ? `dans ${d} min` : `dans ${Math.floor(d/60)} h ${String(d%60).padStart(2,"0")}`;
+const serviceDate = d => { const x = new Date(d.getTime() - 4*3600e3); return `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,"0")}-${String(x.getDate()).padStart(2,"0")}`; };
+async function api(path, opts={}){
+  if(!API_BASE) throw new Error("no-api");
+  const ctrl = new AbortController(); const tm = setTimeout(()=>ctrl.abort(), 9000);
+  const token = store.get("token");
+  try{
+    const r = await fetch(API_BASE + path, {...opts, signal:ctrl.signal, headers:{"Content-Type":"application/json", ...(token?{Authorization:"Bearer "+token}:{}), ...(opts.headers||{})}});
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw Object.assign(new Error(j.error || "Erreur serveur"), {status:r.status});
+    return j;
+  } finally { clearTimeout(tm); }
+}
 
-let route = null, dir = null, manualRoute = false, manualDir = false;
-try { $("showpast").checked = localStorage.getItem("showpast")==="1"; } catch(e){}
+// ---------- état ----------
+let station = store.get("station");
+let route = null, dir = null, manualRoute = false, manualDir = false, tab = "trains";
+let boards = store.get("boards", {});        // dernières réponses temps réel, par trajet
+let lastFetch = {}, fetching = {};
+$("showpast").checked = !!store.get("showpast", false);
 
+function legKey(){ const R = ROUTES[route]; return dir==="ab" ? [station, R.far] : [R.far, station]; }
+
+// ---------- premier lancement ----------
+let walk = Object.assign({monaco:15, nice:0, antibes:0}, store.get("walk", {}));
+const walkFor = st => st==="monaco" ? walk.monaco : st==="antibes" ? walk.antibes : walk.nice;
+function openSetup(){
+  $("setup").hidden = false; paintSetup();
+}
+function paintSetup(){
+  document.querySelectorAll("#stations button").forEach(b => b.setAttribute("aria-pressed", b.dataset.st===station));
+  document.querySelectorAll(".step").forEach(el => el.querySelector("output").textContent = `${walk[el.dataset.w]} min`);
+  $("w-nice-label").textContent = station ? `${LABEL[station]}, depuis chez toi` : "Ta gare de Nice, depuis chez toi";
+  $("setup-done").disabled = !station; $("setup-done").style.opacity = station ? 1 : .4;
+}
+document.querySelectorAll("#stations button").forEach(b => b.onclick = () => { station = b.dataset.st; store.set("station", station); paintSetup(); });
+document.querySelectorAll(".step button").forEach(b => b.onclick = () => {
+  const k = b.closest(".step").dataset.w; walk[k] = Math.max(0, Math.min(45, walk[k] + (+b.dataset.d)));
+  store.set("walk", walk); paintSetup();
+});
+$("setup-done").onclick = () => { if(!station) return; $("setup").hidden = true; render(); refresh(true); MAP.redraw(); };
+$("gear").onclick = openSetup;
+
+// ---------- temps réel ----------
+async function refresh(force){
+  if(!API_BASE || !station || !route) return;
+  const [from, to] = legKey(), key = from+">"+to;
+  if(fetching[key]) return;
+  if(!force && lastFetch[key] && Date.now()-lastFetch[key] < 60000) return;
+  fetching[key] = true;
+  try{
+    const b = await api(`/api/board?from=${from}&to=${to}`);
+    boards[key] = {...b, fetchedAt: Date.now()};
+    store.set("boards", boards);
+    lastFetch[key] = Date.now();
+  }catch(e){ lastFetch[key] = Date.now() - 45000; /* réessai dans 15 s */ }
+  finally{ fetching[key] = false; render(); }
+}
+
+// ---------- rendu Trains ----------
 function render(){
-  const now = new Date(), wd = now.getDay(), mins = nowMin(now);
-  const serviceDay = now.getHours()<4 ? (wd+6)%7 : wd; // after midnight, still "last night"
-  const weekend = serviceDay===0 || serviceDay===6;
+  const now = new Date(), wd = now.getDay(), mins = nowMin(now), day = serviceDate(now);
+  const sDay = now.getHours()<4 ? (wd+6)%7 : wd, weekend = sDay===0 || sDay===6;
   $("clock").textContent = now.toTimeString().slice(0,5);
+  if(!station){ openSetup(); return; }
   if(!manualRoute) route = weekend ? "antibes" : "monaco";
   const R = ROUTES[route];
   if(!manualDir) dir = mins < toMin(R.flipAt) ? "ab" : "ba";
+  const [from, to] = legKey();
+  const fromL = LABEL[from], toL = LABEL[to];
 
+  $("title").textContent = `${LABEL[station]} ⇄ ${R.name}`;
   $("r-monaco").setAttribute("aria-pressed", route==="monaco");
   $("r-antibes").setAttribute("aria-pressed", route==="antibes");
-  $("b-ab").textContent = `Nice → ${R.far}`;
-  $("b-ba").textContent = `${R.far} → Nice`;
+  $("b-ab").textContent = `${short(station)} → ${R.name}`;
+  $("b-ba").textContent = `${R.name} → ${short(station)}`;
   $("b-ab").setAttribute("aria-pressed", dir==="ab");
   $("b-ba").setAttribute("aria-pressed", dir==="ba");
-  $("title").textContent = `Nice-Ville ⇄ ${R.name}`;
-  $("live").href = R.live;
+  $("board-title").textContent = `Départs de ${fromL}`;
 
-  const from = dir==="ab" ? "Nice-Ville" : R.far, to = dir==="ab" ? R.far : "Nice-Ville";
-  $("board-title").textContent = `Départs de ${from}`;
-  const list = R[dir].map(([d,a,o]) => (serviceDay===5 && o && o.f) ? [o.f[0],o.f[1],o] : [d,a,o||{}]);
-  const upcoming = list.filter(([d]) => toMin(d) >= mins);
-  const [w0,w1] = R.win[dir].map(toMin);
-
-  if(upcoming.length){
-    const [d,a,o] = upcoming[0];
-    $("h-label").textContent = `Prochain train · ${from} → ${to}`;
-    $("h-time").textContent = d;
-    $("h-in").textContent = fmtIn(toMin(d)-mins);
-    $("h-arr").textContent = `Arrivée ${to} ${a} · ${toMin(a)-toMin(d)} min${o.q?" · jour de circulation à vérifier":""}`;
-    $("h-then").innerHTML = upcoming.slice(1,4).map(([x]) => `<span>${x}</span>`).join("");
+  // Source : temps réel du jour si dispo, sinon grille
+  const live = boards[from+">"+to];
+  const useLive = live && live.day === day && live.trains && live.trains.length;
+  let list;
+  if(useLive){
+    list = live.trains.map(t => ({num:t.num, dep:t.dep, arr:t.arr, depRt:t.depRt, arrRt:t.arrRt, delay:t.delay, status:t.status, mode:t.mode}));
   } else {
-    $("h-label").textContent = `${from} → ${to}`;
+    const off = OFFS[route][dir][station] || 0, approx = station !== "ville";
+    list = R[dir].map(([d,a,o]) => { o=o||{}; if(sDay===5 && o.f){ [d,a]=o.f; }
+      return dir==="ab" ? {dep:shift(d,off), arr:a, q:o.q, approx} : {dep:d, arr:shift(a,off), q:o.q, approx}; });
+  }
+  const eff = t => t.depRt || t.dep;
+  const ok = list.filter(t => t.status !== "cancelled");
+  const upcoming = ok.filter(t => toMin(eff(t)) >= mins).sort((x,y)=>toMin(eff(x))-toMin(eff(y)));
+  const wk = walkFor(from);
+  const catchable = upcoming.filter(t => toMin(eff(t)) - mins >= wk);
+  const tight = new Set(upcoming.filter(t => toMin(eff(t)) - mins < wk));
+
+  // Indicateur temps réel
+  const age = useLive ? Math.round((Date.now()-live.fetchedAt)/60000) : null;
+  $("dot").className = "dot" + (useLive ? (age<=3 ? " on" : " old") : "");
+  $("live-txt").textContent = !API_BASE ? "Horaires théoriques (temps réel pas encore branché)"
+    : useLive ? (age<=3 ? `En direct · mis à jour à ${new Date(live.fetchedAt).toTimeString().slice(0,5)}` : `Dernière mise à jour à ${new Date(live.fetchedAt).toTimeString().slice(0,5)}, pas de réseau depuis`)
+    : (live && live.day === day) ? "Temps réel indisponible pour ce trajet · horaires théoriques"
+    : navigator.onLine ? "Chargement du temps réel…" : "Pas de réseau · horaires théoriques";
+
+  // Prochain train qu'on peut encore attraper
+  if(catchable.length){
+    const t = catchable[0], e = eff(t);
+    $("h-label").textContent = `Prochain train · ${fromL} → ${toL}`;
+    $("h-time").innerHTML = (t.delay>0 && t.depRt ? `<s>${t.dep}</s>` : "") + e;
+    $("h-in").textContent = fmtIn(toMin(e)-mins);
+    $("h-in").className = "pill tnum" + (t.delay>=5 ? " bad" : "");
+    const a = t.arrRt || t.arr;
+    $("h-arr").textContent = `Arrivée ${toL} ${a}` + (t.delay>0 ? ` · retard ${t.delay} min` : "") + (t.approx ? " · heure approx." : "") + (t.q ? " · jour à vérifier" : "") + (t.mode && t.mode!=="TER" ? ` · ${t.mode}` : "");
+    const tl = [...tight];
+    $("h-then").innerHTML = catchable.slice(1,4).map(x => `<span>${eff(x)}${x.delay>=5?" ⚠":""}</span>`).join("")
+      + (tl.length ? `<span class="walk" style="border-style:dashed">trop juste : ${tl.map(eff).join(", ")}</span>` : "");
+  } else {
+    $("h-label").textContent = `${fromL} → ${toL}`;
     $("h-time").textContent = "Fini";
-    $("h-in").textContent = "plus de train dans la liste";
-    $("h-arr").textContent = route==="monaco" && dir==="ba" ? "Après 21h21 : vérifie sur SNCF Connect (travaux de nuit)." : `Premier départ demain : ${list[0][0]}`;
+    $("h-in").textContent = "plus de train attrapable"; $("h-in").className = "pill tnum";
+    $("h-arr").textContent = route==="monaco" ? "Vérifie sur SNCF Connect (travaux de nuit)." : "";
     $("h-then").innerHTML = "";
   }
 
-  const show = $("showpast").checked, nextD = upcoming[0] && upcoming[0][0];
-  $("list").innerHTML = list.map(([d,a,o]) => {
-    const t = toMin(d), past = t < mins, next = d===nextD, win = t>=w0 && t<=w1;
-    const cls = [past?"past":"", past&&!show?"hide":"", next?"next":"", win?"win":""].join(" ");
-    const tags = (win?'<span class="tag">ton créneau</span>':'') + (o.q?'<span class="tag q">à vérifier</span>':'');
-    return `<li class="${cls}"><span class="dep tnum">${d}</span><span class="to tnum">→ ${to} ${a}${tags}</span><span class="in tnum">${past?"parti":fmtIn(t-mins)}</span></li>`;
+  // Liste
+  const show = $("showpast").checked, next = catchable[0];
+  const [w0,w1] = R.win[dir].map(toMin);
+  $("list").innerHTML = list.map(t => {
+    const e = eff(t), tm = toMin(e), past = tm < mins, isNext = t===next, win = toMin(t.dep)>=w0 && toMin(t.dep)<=w1;
+    const cancel = t.status === "cancelled", isTight = tight.has(t);
+    const cls = [past?"past":"", past&&!show?"hide":"", isNext?"next":"", win?"win":"", cancel?"cancel":"", isTight?"tight":""].join(" ");
+    let tags = "";
+    if(cancel) tags += '<span class="tag bad">supprimé</span>';
+    else if(t.delay>0) tags += `<span class="tag late">+${t.delay} min</span>`;
+    if(isTight) tags += `<span class="tag tight">trop juste</span>`;
+    if(t.mode && t.mode!=="TER") tags += `<span class="tag q">${esc(t.mode)}</span>`;
+    if(win && !cancel && !isTight) tags += '<span class="tag">ton créneau</span>';
+    if(t.q) tags += '<span class="tag q">à vérifier</span>';
+    const depHtml = (t.delay>0 && t.depRt && !cancel) ? `${e}<s>${t.dep}</s>` : (t.approx ? "≈"+t.dep : t.dep);
+    const right = cancel ? "" : past ? "parti" : fmtIn(tm-mins);
+    return `<li class="${cls}"${t.num?` data-num="${esc(t.num)}"`:""}><span class="dep tnum">${depHtml}</span><span class="to tnum">→ ${esc(toL)} ${t.arrRt||t.arr}${tags}</span><span class="in tnum">${right}</span></li>`;
   }).join("");
 
+  // Bandeau
   const b = $("banner");
   if(route==="monaco"){
-    const nightCut = serviceDay>=0 && serviceDay<=4;
+    const nightCut = sDay>=0 && sDay<=4;
     b.className = "warn";
     b.innerHTML = nightCut
-      ? `<strong>Travaux ce soir.</strong> Aucun train entre Nice et Vintimille de 22h à 6h (dimanche au jeudi soir, jusqu'au 11 décembre). Si tu rates le dernier, prends le bus ZOU 600 ou 601, accepté avec l'abonnement train ZOU.`
+      ? `<strong>Travaux ce soir.</strong> Aucun train entre Nice et Vintimille de 22h à 6h (dimanche au jeudi soir, jusqu'au 11 décembre). Bus ZOU 600 ou 601 acceptés avec l'abonnement train ZOU.`
       : `<strong>Vendredi et samedi soir :</strong> trains de nuit normaux. Du dimanche au jeudi, coupure de 22h à 6h jusqu'au 11 décembre.`;
-    $("daynote").textContent = weekend
-      ? "Week-end : cette grille est celle de la semaine. La plupart des trains roulent tous les jours, mais vérifie sur SNCF Connect."
-      : serviceDay===5 ? "Vendredi : les départs de 20h47 et 21h17 passent à 20h46 et 21h21." : "";
   } else {
     b.className = "warn info";
-    b.innerHTML = `<strong>Grille du week-end.</strong> Seuls les trains ZOU de la ligne 04 sont listés. Les TER Marseille–Nice s'arrêtent aussi à Antibes, il y a donc parfois un train de plus.`;
-    $("daynote").textContent = "« À vérifier » : la fiche ne dit pas clairement si ce train roule le samedi, le dimanche ou les deux.";
+    b.innerHTML = useLive ? `<strong>En direct :</strong> TER, Intercités et OUIGO qui s'arrêtent à ${esc(toL==="Antibes"?"Antibes":fromL)}. Les TGV inOui sont exclus.`
+      : `<strong>Sans réseau :</strong> seuls les trains ZOU de la ligne 04 sont listés. Avec du réseau, l'app ajoute les TER Marseille–Nice et les autres trains.`;
   }
+  const notes = [];
+  if(!useLive && station!=="ville") notes.push(`≈ : heure à ${LABEL[station]} estimée à partir de Nice-Ville (1 à 2 min près).`);
+  if(!useLive && list.some(t=>t.q)) notes.push("« À vérifier » : la fiche ne dit pas clairement si ce train roule le samedi, le dimanche ou les deux.");
+  $("daynote").textContent = notes.join(" ");
 }
-$("r-monaco").onclick = () => { manualRoute = true; manualDir = false; route = "monaco"; render(); };
-$("r-antibes").onclick = () => { manualRoute = true; manualDir = false; route = "antibes"; render(); };
-$("b-ab").onclick = () => { manualDir = true; dir = "ab"; render(); };
-$("b-ba").onclick = () => { manualDir = true; dir = "ba"; render(); };
-$("showpast").onchange = () => { try{ localStorage.setItem("showpast", $("showpast").checked?"1":"0"); }catch(e){} render(); };
-render();
-setInterval(render, 20000);
-document.addEventListener("visibilitychange", () => { if(!document.hidden) render(); });
-</script>
+const short = s => s==="ville" ? "Nice" : s==="riquier" ? "Riquier" : "St-Augustin";
 
-<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));}</script>
+$("r-monaco").onclick = () => { manualRoute=true; manualDir=false; route="monaco"; render(); refresh(); };
+$("r-antibes").onclick = () => { manualRoute=true; manualDir=false; route="antibes"; render(); refresh(); };
+$("b-ab").onclick = () => { manualDir=true; dir="ab"; render(); refresh(); };
+$("b-ba").onclick = () => { manualDir=true; dir="ba"; render(); refresh(); };
+$("showpast").onchange = () => { store.set("showpast", $("showpast").checked); render(); };
+
+// ---------- onglets ----------
+function setTab(t){
+  tab = t;
+  for(const k of ["trains","map","game"]){
+    $("tab-"+k).setAttribute("aria-selected", t===k);
+    $("pane-"+k).hidden = t!==k;
+    $("pane-"+k).style.display = t===k ? "flex" : "";
+  }
+  if(t==="game") loadGame();
+  if(t==="map") MAP.open(); else MAP.close();
+}
+$("tab-trains").onclick = () => setTab("trains");
+$("tab-map").onclick = () => setTab("map");
+$("tab-game").onclick = () => setTab("game");
+$("list").addEventListener("click", e => { const li = e.target.closest("li[data-num]"); if(li){ setTab("map"); MAP.select(li.dataset.num); } });
+
+// ---------- Paris ----------
+let gameData = null, gameErr = "", draft = {};
+async function loadGame(){
+  if(!API_BASE){ gameErr = "Les paris arrivent dès que le serveur est branché."; return renderGame(); }
+  try{ gameData = await api("/api/game"); gameErr = ""; }
+  catch(e){ gameErr = navigator.onLine ? e.message : "Pas de réseau. Les paris reviennent dès que tu captes."; }
+  renderGame();
+}
+function renderGame(){
+  const el = $("game");
+  const token = store.get("token");
+  if(!token){
+    el.innerHTML = `<div class="card">
+      <h2>Rejoindre les paris</h2>
+      <p class="note">Entre le code d'équipe donné par tes collègues et choisis un pseudo.</p>
+      <label class="f">Code d'équipe<input type="text" id="j-team" autocomplete="off" autocapitalize="characters"></label>
+      <label class="f">Pseudo<input type="text" id="j-name" maxlength="20" autocomplete="nickname"></label>
+      <p class="msg" id="j-msg">${esc(gameErr && API_BASE ? "" : gameErr)}</p>
+      <button class="btn" id="j-go" type="button">Rejoindre</button>
+    </div>${rulesHtml()}`;
+    $("j-go").onclick = async () => {
+      try{ const r = await api("/api/join", {method:"POST", body:JSON.stringify({team:$("j-team").value, name:$("j-name").value})});
+        store.set("token", r.token); store.set("name", r.name); loadGame(); }
+      catch(e){ $("j-msg").textContent = e.message === "no-api" ? "Serveur pas encore branché." : e.message; }
+    };
+    return;
+  }
+  if(gameErr || !gameData){ el.innerHTML = `<div class="card"><p class="note">${esc(gameErr || "Chargement…")}</p></div>`; return; }
+  const g = gameData, w = g.window;
+  const resBy = Object.fromEntries((g.results||[]).map(r => [r.train, r]));
+  let html = "";
+
+  // Gagnant de la semaine, le vendredi
+  if(g.isFriday && g.lastWeek.rows.length){
+    const top = g.lastWeek.rows[0];
+    html += `<div class="trophy"><div class="eyebrow">Gagnant de la semaine</div><div class="who">${esc(top.name)}</div><div>${top.points} points · ${top.wins} paris gagnés</div></div>`;
+  }
+  // Statut
+  const st = !w.weekday ? ["wait","Pas de paris le week-end"] : w.open ? ["open",`Paris ouverts jusqu'à ${w.closesAt}`]
+    : w.closed ? ["closed","Paris fermés · résultats après chaque départ"] : ["wait",`Ouverture à ${w.opensAt}`];
+  html += `<div class="card"><div class="status ${st[0]}">${st[1]}</div>
+    <p class="note">Joueur : <b>${esc(g.me ? g.me.name : store.get("name"))}</b>${w.weekday ? ` · ${g.myCount}/${g.rules.maxBets} paris aujourd'hui` : ""}</p>`;
+
+  if(w.weekday && g.trains.length){
+    html += `<div class="bets">`;
+    for(const t of g.trains){
+      const mine = g.bets.find(b => b.train===t.num && b.mine);
+      const others = g.bets.filter(b => b.train===t.num);
+      const res = resBy[t.num];
+      const resTxt = res ? (res.void ? "pas de résultat" : res.cancelled ? "supprimé" : res.delay>=g.rules.lateAt ? `+${res.delay} min` : res.delay>0 ? `+${res.delay} min (à l'heure)` : "à l'heure") : "";
+      html += `<div class="bet"><div class="bet-top"><span class="t tnum">${t.dep}</span><span class="note">Monaco → Nice${resTxt ? ` · <b>${resTxt}</b>` : t.status==="cancelled" ? " · supprimé" : ""}</span></div>`;
+      if(w.open && t.status!=="cancelled"){
+        const d = draft[t.num] || (mine ? {late:!!mine.late, minutes:mine.minutes||10} : null);
+        const late = d ? d.late : null;
+        html += `<div class="choice">
+          <button type="button" data-t="${t.num}" data-late="0" aria-pressed="${late===false}">À l'heure</button>
+          <button type="button" data-t="${t.num}" data-late="1" aria-pressed="${late===true}">En retard</button>
+          <button type="button" class="x" data-t="${t.num}" data-x="1" aria-label="Retirer le pari" ${mine?"":"hidden"}>✕</button></div>`;
+        if(late) html += `<div class="mins">Retard estimé <select data-t="${t.num}" class="m">${[5,6,7,8,10,12,15,20,25,30,45,60].map(m=>`<option value="${m}" ${(d.minutes||10)==m?"selected":""}>${m} min</option>`).join("")}</select></div>`;
+      } else if(others.length){
+        html += `<div class="who">${others.map(b => `<span class="chip${b.mine?" me":""}"><b>${esc(b.name)}</b> ${b.late?`retard ${b.minutes} min`:"à l'heure"}${b.settled?` · ${b.points} pts`:""}</span>`).join("")}</div>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+  } else if(w.weekday){
+    html += `<p class="note">Pas de train Monaco → Nice trouvé pour ce soir.</p>`;
+  }
+  html += `<p class="msg" id="g-msg"></p></div>`;
+
+  // Classement
+  const rows = g.week.rows;
+  html += `<div class="card"><h2>Classement de la semaine</h2><p class="note">Du ${fmtDate(g.week.start)} au ${fmtDate(g.week.end)}</p>`;
+  html += rows.length ? rows.map((r,i) => `<div class="rank"><span class="n">${i+1}</span><span>${esc(r.name)} <span class="note">· ${r.wins}/${r.bets}</span></span><span class="p tnum">${r.points} pts</span></div>`).join("")
+    : `<p class="note">Aucun point pour l'instant.</p>`;
+  html += `</div>${rulesHtml()}`;
+  el.innerHTML = html;
+
+  el.querySelectorAll(".choice button").forEach(btn => btn.onclick = () => {
+    const n = btn.dataset.t;
+    if(btn.dataset.x){ delete draft[n]; return saveBet(n, null); }
+    const late = btn.dataset.late === "1";
+    const prev = draft[n] || {};
+    draft[n] = {late, minutes: prev.minutes || 10};
+    saveBet(n, draft[n]);
+  });
+  el.querySelectorAll("select.m").forEach(s => s.onchange = () => { draft[s.dataset.t] = {late:true, minutes:+s.value}; saveBet(s.dataset.t, draft[s.dataset.t]); });
+}
+async function saveBet(train, d){
+  try{
+    await api("/api/bet", {method:"POST", body:JSON.stringify(d ? {train, late:d.late, minutes:d.minutes} : {train, remove:true})});
+    await loadGame();
+  }catch(e){ delete draft[train]; renderGame(); const m=$("g-msg"); if(m) m.textContent = e.message; }
+}
+const fmtDate = s => { const [y,m,d] = s.split("-"); return `${+d}/${+m}`; };
+function rulesHtml(){
+  return `<div class="card"><h2>Règles</h2><ul class="rules">
+    <li>En semaine, paris ouverts de 13h45 à 15h sur les trains Monaco → Nice de 16h à 21h30.</li>
+    <li>3 paris maximum par jour. Tu peux changer d'avis jusqu'à 15h.</li>
+    <li>Retard = départ de Monaco avec 5 min ou plus. Bon pronostic : 10 pts.</li>
+    <li>Bonus minutes si tu as dit « en retard » et qu'il l'est : 10 pts moins l'écart en minutes.</li>
+    <li>Train supprimé : 15 pts pour ceux qui avaient dit « en retard ».</li>
+    <li>Les paris des autres s'affichent après 15h. Semaine du vendredi au jeudi, gagnant annoncé le vendredi.</li>
+  </ul></div>`;
+}
+
+// ---------- Carte : la côte de St-Augustin à Monaco, dessinée en maillage 3D ----------
+// Tracés stylisés (pas une carte topographique). Positions des trains estimées d'après horaires + retard.
+const MAP = (() => {
+  const LON0 = 7.30, LAT0 = 43.70, KX = 80.5, KY = 111.2;          // km par degré à cette latitude
+  const P = (lon, lat) => [(lon - LON0) * KX, (lat - LAT0) * KY];
+  const COAST = [[7.180,43.655],[7.195,43.656],[7.200,43.650],[7.212,43.646],[7.226,43.652],[7.229,43.664],[7.240,43.677],[7.252,43.688],[7.266,43.693],[7.279,43.695],
+    [7.286,43.693],[7.292,43.695],[7.301,43.692],[7.308,43.688],[7.311,43.695],[7.314,43.702],[7.318,43.699],[7.320,43.690],[7.324,43.681],[7.331,43.672],
+    [7.338,43.676],[7.342,43.685],[7.336,43.691],[7.334,43.700],[7.340,43.707],[7.350,43.711],[7.362,43.714],[7.373,43.711],[7.384,43.716],[7.396,43.719],
+    [7.405,43.720],[7.414,43.725],[7.420,43.729],[7.424,43.736],[7.432,43.739],[7.440,43.742],[7.452,43.747]].map(([a,b]) => P(a,b));
+  const ST = {   // gares sur la ligne, dans l'ordre
+    staug:[7.2137,43.6697,"Nice-St-Augustin"], ville:[7.2617,43.7046,"Nice-Ville"], riquier:[7.2862,43.7067,"Nice-Riquier"],
+    villefranche:[7.3110,43.7046,"Villefranche"], beaulieu:[7.3325,43.7085,"Beaulieu"], eze:[7.3620,43.7176,"Èze"],
+    capdail:[7.4040,43.7246,"Cap-d'Ail"], monaco:[7.4195,43.7388,"Monaco"]
+  };
+  const ST_RE = {staug:/augustin/i, ville:/^nice(\s*-?\s*ville)?$/i, riquier:/riquier/i, villefranche:/villefranche/i, beaulieu:/beaulieu/i, eze:/^[eè]ze/i, capdail:/cap.?d.?ail/i, monaco:/monaco/i};
+  // Voie : points [lon, lat, gare?, tunnel jusqu'au point suivant?]
+  const TRACK = [[7.2137,43.6697,"staug"],[7.228,43.680],[7.240,43.690],[7.252,43.699],[7.2617,43.7046,"ville"],[7.272,43.708],[7.2862,43.7067,"riquier",1],
+    [7.296,43.7055,0,1],[7.304,43.7050],[7.3110,43.7046,"villefranche"],[7.318,43.7058,0,1],[7.326,43.7075],[7.3325,43.7085,"beaulieu"],[7.342,43.7110,0,1],
+    [7.350,43.7135],[7.3620,43.7176,"eze"],[7.372,43.7155,0,1],[7.384,43.7190],[7.394,43.7215,0,1],[7.4040,43.7246,"capdail",1],[7.412,43.7300,0,1],[7.4195,43.7388,"monaco"]]
+    .map(([lon,lat,st,tun]) => ({p:P(lon,lat), st:st||null, tun:!!tun}));
+  let cum = 0; TRACK.forEach((t,i) => { if(i){ const a = TRACK[i-1].p; cum += Math.hypot(t.p[0]-a[0], t.p[1]-a[1]); } t.d = cum; });
+  const stDist = Object.fromEntries(TRACK.filter(t => t.st).map(t => [t.st, t.d]));
+  const PEAKS = [[7.300,43.700,.19,.55],[7.297,43.706,.22,.45],[7.302,43.721,.37,.8],[7.300,43.737,.37,.9],[7.330,43.684,.05,.5],[7.343,43.726,.58,1.0],
+    [7.370,43.736,.55,1.2],[7.405,43.741,.55,.7],[7.430,43.772,1.1,1.7],[7.245,43.765,.85,1.7],[7.272,43.722,.13,.8],[7.222,43.702,.26,1.3],[7.385,43.728,.42,.7]]
+    .map(([lon,lat,h,s]) => [...P(lon,lat),h,s]);
+  const X0 = -8.6, X1 = 11.4, Y0 = -3.0, Y1 = 6.4, STEP = .3, EX = 2.5, PITCH = 52*Math.PI/180, D = 40;
+
+  const inLand = (x, y) => {           // terre = au nord du trait de côte
+    let lo = COAST[0][1];
+    if(x <= COAST[0][0]) lo = COAST[0][1];
+    else if(x >= COAST[COAST.length-1][0]) lo = COAST[COAST.length-1][1];
+    // le cap Ferrat fait des allers-retours : test point-dans-polygone (côte + bord nord)
+    const poly = [...COAST, [X1+5, COAST[COAST.length-1][1]], [X1+5, Y1+5], [X0-5, Y1+5], [X0-5, COAST[0][1]]];
+    let inside = false;
+    for(let i=0, j=poly.length-1; i<poly.length; j=i++){
+      const [xi,yi] = poly[i], [xj,yj] = poly[j];
+      if((yi>y) !== (yj>y) && x < (xj-xi)*(y-yi)/(yj-yi)+xi) inside = !inside;
+    }
+    return inside;
+  };
+  const coastDist = (x, y) => { let m = 9; for(let i=1;i<COAST.length;i++){ const [ax,ay]=COAST[i-1],[bx,by]=COAST[i]; const dx=bx-ax, dy=by-ay; const t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy))); m=Math.min(m,Math.hypot(x-ax-t*dx,y-ay-t*dy)); } return m; };
+  const height = (x, y) => {
+    if(!inLand(x,y)) return 0;
+    let h = .06 * Math.min(1, coastDist(x,y)/.8) + .12 * Math.max(0, Math.min(1, (y+1)/7));
+    for(const [px,py,ph,ps] of PEAKS){ const d2 = (x-px)**2 + (y-py)**2; h += ph * Math.exp(-d2/(2*ps*ps)); }
+    h *= 1 - .65*Math.exp(-((x+5.6)**2)/(2*.8*.8));   // plaine du Var
+    return h;
+  };
+  // Grille précalculée
+  const cols = Math.round((X1-X0)/STEP)+1, rows = Math.round((Y1-Y0)/STEP)+1;
+  const G = []; for(let r=0;r<rows;r++){ const row=[]; for(let c=0;c<cols;c++){ const x=X0+c*STEP, y=Y0+r*STEP; row.push({x,y,z:height(x,y),land:inLand(x,y)}); } G.push(row); }
+  TRACK.forEach(t => t.z = Math.max(.012, height(t.p[0], t.p[1]) * .35));
+
+  let cv, ctx, W=0, H=0, dpr=1, K=1, CX=0, CY=0, base=null;
+  let data = store.get("mapData"), selected = null, raf = 0, timer = 0, lastFetch = 0, visible = false, hits = [];
+  const proj = (x, y, z) => {
+    const v = y*Math.cos(PITCH) + z*EX*Math.sin(PITCH), w = y*Math.sin(PITCH) - z*EX*Math.cos(PITCH);
+    const s = D/(D+w);
+    return [CX + x*K*s, CY - v*K*s, s];
+  };
+  function fit(){
+    const r = cv.getBoundingClientRect(); dpr = Math.min(2, devicePixelRatio||1);
+    W = r.width; H = r.height; cv.width = Math.round(W*dpr); cv.height = Math.round(H*dpr);
+    // cadrage : toute la côte en largeur
+    K = 1; CX = 0; CY = 0;
+    // cadrage sur la voie et la côte, relief compris, avec de la place pour les noms des gares
+    const pts = [];
+    for(const t of TRACK) pts.push(proj(t.p[0], t.p[1], t.z));
+    for(const [x,y] of COAST) if(x > -8 && x < 11 && y > -3.2) pts.push(proj(x, y, 0));
+    for(const row of G) for(const q of row) if(q.land && q.x > -7.6 && q.x < 10.6) pts.push(proj(q.x, q.y, q.z));
+    const minX = Math.min(...pts.map(p=>p[0])), maxX = Math.max(...pts.map(p=>p[0]));
+    const minY = Math.min(...pts.map(p=>p[1])), maxY = Math.max(...pts.map(p=>p[1]));
+    const padTop = 30, padBot = 26, padX = 14;
+    K = Math.min((W-2*padX)/(maxX-minX), (H-padTop-padBot)/(maxY-minY));
+    CX = W/2 - (minX+maxX)/2*K; CY = padTop + (H-padTop-padBot)/2 - (minY+maxY)/2*K;
+    drawBase();
+  }
+  function drawBase(){
+    base = document.createElement("canvas"); base.width = cv.width; base.height = cv.height;
+    const g = base.getContext("2d"); g.setTransform(dpr,0,0,dpr,0,0); g.lineCap = "round";
+    // mer : lignes horizontales pointillées
+    g.lineWidth = .6;
+    for(let r=0;r<rows;r+=2){ g.beginPath(); let on=false;
+      for(let c=0;c<cols;c++){ const q=G[r][c]; if(q.land){ on=false; continue; } const [sx,sy]=proj(q.x,q.y,0); if(!on){ g.moveTo(sx,sy); on=true; } else g.lineTo(sx,sy); }
+      g.strokeStyle = `rgba(56,140,190,${.16 + .2*(1-r/rows)})`; g.setLineDash([1.5,4]); g.stroke(); }
+    g.setLineDash([]);
+    // relief : maillage, du fond vers l'avant
+    for(let r=rows-1;r>=0;r--){
+      for(let c=0;c<cols;c++){
+        const q = G[r][c]; if(!q.land) continue;
+        const a = proj(q.x,q.y,q.z);
+        for(const [dr,dc] of [[0,1],[1,0]]){
+          const n = G[r+dr] && G[r+dr][c+dc]; if(!n || !n.land) continue;
+          const b = proj(n.x,n.y,n.z), h = (q.z+n.z)/2;
+          const t = Math.min(1, h/0.9);
+          g.strokeStyle = `rgba(${Math.round(90+120*t)},${Math.round(170+40*t)},${Math.round(210+30*t)},${.16 + .38*t})`;
+          g.lineWidth = .55 + .5*t;
+          g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke();
+        }
+      }
+    }
+    // trait de côte
+    g.save(); g.shadowColor = "rgba(125,211,252,.8)"; g.shadowBlur = 8; g.strokeStyle = "#7dd3fc"; g.lineWidth = 1.4;
+    g.beginPath(); COAST.forEach(([x,y],i) => { const [sx,sy] = proj(x,y,0); i ? g.lineTo(sx,sy) : g.moveTo(sx,sy); }); g.stroke(); g.restore();
+    // voie ferrée : à l'air libre en ambre, tunnels en pointillés
+    for(let i=1;i<TRACK.length;i++){
+      const a = TRACK[i-1], b = TRACK[i], pa = proj(a.p[0],a.p[1],a.z), pb = proj(b.p[0],b.p[1],b.z);
+      g.save();
+      if(a.tun){ g.setLineDash([3,4]); g.strokeStyle = "rgba(242,181,49,.55)"; g.lineWidth = 1.6; }
+      else { g.shadowColor = "rgba(242,181,49,.7)"; g.shadowBlur = 6; g.strokeStyle = "#f2b531"; g.lineWidth = 2.4; }
+      g.beginPath(); g.moveTo(pa[0],pa[1]); g.lineTo(pb[0],pb[1]); g.stroke(); g.restore();
+    }
+    // gares : petit mât + nom
+    const small = W < 520;
+    const LVL = {staug:0, ville:0, riquier:2, villefranche:0, beaulieu:1, eze:0, capdail:1, monaco:2};
+    const SHORT = {staug:"St-Augustin", ville:"Nice-Ville", riquier:"Riquier", villefranche:"Villefranche", beaulieu:"Beaulieu", eze:"Èze", capdail:"Cap-d'Ail", monaco:"Monaco"};
+    g.font = `600 ${small?10.5:12.5}px "Barlow Condensed","Arial Narrow",sans-serif`; g.textAlign = "center";
+    TRACK.filter(t => t.st).forEach(t => {
+      const [sx,sy] = proj(t.p[0],t.p[1],t.z), mine = t.st===station || t.st==="monaco";
+      const up = (small ? [14, 30, 46] : [18, 38, 58])[LVL[t.st]];
+      g.strokeStyle = mine ? "rgba(242,181,49,.8)" : "rgba(201,211,230,.45)"; g.lineWidth = 1;
+      g.beginPath(); g.moveTo(sx,sy); g.lineTo(sx,sy-up); g.stroke();
+      g.fillStyle = mine ? "#f2b531" : "#e7ecf5"; g.beginPath(); g.arc(sx,sy,mine?3.6:2.6,0,7); g.fill();
+      g.fillStyle = mine ? "#f2b531" : "#c9d3e6";
+      const label = (small ? SHORT[t.st] : ST[t.st][2]).toUpperCase(), tw = g.measureText(label).width;
+      g.fillText(label, Math.max(tw/2+4, Math.min(W-tw/2-4, sx)), sy-up-4);
+    });
+  }
+
+  // ----- trains -----
+  const tMin = hm => toMin(hm);
+  function corridor(stops, delay){   // arrêts du train qui sont sur notre tronçon
+    const out = [];
+    for(const s of stops){ const k = Object.keys(ST_RE).find(k => ST_RE[k].test(s.name)); if(k) out.push({k, arr:tMin(s.arr||s.dep)+delay, dep:tMin(s.dep||s.arr)+delay}); }
+    return out;
+  }
+  function offlineTrains(){   // sans réseau : grille ZOU Nice-Ville ⇄ Monaco du jour
+    const wd = new Date(Date.now()-4*3600e3).getDay(), fri = wd===5;
+    const mk = (d,a,o,dir) => { o=o||{}; if(fri && o.f) [d,a]=o.f;
+      return dir==="ab" ? {num:"", mode:"TER", direction:"Monaco", delay:0, theo:true, stops:[{name:"Nice St-Augustin",arr:shift(d,-10),dep:shift(d,-10)},{name:"Nice Ville",arr:d,dep:d},{name:"Monaco",arr:a,dep:a}]}
+                        : {num:"", mode:"TER", direction:"Nice", delay:0, theo:true, stops:[{name:"Monaco",arr:d,dep:d},{name:"Nice Ville",arr:a,dep:a},{name:"Nice St-Augustin",arr:shift(a,10),dep:shift(a,10)}]}; };
+    return [...ROUTES.monaco.ab.map(([d,a,o]) => mk(d,a,o,"ab")), ...ROUTES.monaco.ba.map(([d,a,o]) => mk(d,a,o,"ba"))]
+      .map((t,i) => ({...t, num: t.num || `${t.stops[0].dep}`}));
+  }
+  function position(tr, now){
+    const c = corridor(tr.stops, tr.delay||0);
+    if(c.length < 2) return null;
+    for(let i=0;i<c.length;i++){
+      if(now >= c[i].arr && now <= c[i].dep) return {d:stDist[c[i].k], at:c[i].k, next:c[i+1], dir:c[c.length-1].k};
+      if(i < c.length-1 && now > c[i].dep && now < c[i+1].arr){
+        const f = (now - c[i].dep) / (c[i+1].arr - c[i].dep);
+        return {d: stDist[c[i].k] + f*(stDist[c[i+1].k]-stDist[c[i].k]), next:c[i+1], dir:c[c.length-1].k};
+      }
+    }
+    return null;
+  }
+  function pointAt(d){
+    for(let i=1;i<TRACK.length;i++){ const a=TRACK[i-1], b=TRACK[i]; if(d <= b.d){ const f=(d-a.d)/((b.d-a.d)||1);
+      return {x:a.p[0]+f*(b.p[0]-a.p[0]), y:a.p[1]+f*(b.p[1]-a.p[1]), z:a.z+f*(b.z-a.z), tun:a.tun}; } }
+    const l = TRACK[TRACK.length-1]; return {x:l.p[0], y:l.p[1], z:l.z, tun:false};
+  }
+  const isMine = tr => { const c = corridor(tr.stops,0).map(s=>s.k); const a = c.indexOf(station), b = c.indexOf("monaco"); return a>=0 && b>=0; };
+  function running(){
+    const live = data && data.day === serviceDate(new Date()) && data.trains && data.trains.length;
+    const list = live ? data.trains : offlineTrains();
+    const now = new Date(), nm = nowMin(now) + now.getSeconds()/60;
+    return {live, trains: list.map(tr => ({tr, pos: position(tr, nm)})).filter(x => x.pos)};
+  }
+
+  function frame(){
+    if(!visible) return;
+    const g = ctx; g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,cv.width,cv.height); g.drawImage(base,0,0);
+    g.setTransform(dpr,0,0,dpr,0,0);
+    const {live, trains} = running(); hits = [];
+    const pulse = (Math.sin(Date.now()/380)+1)/2;
+    for(const {tr,pos} of trains){
+      const pt = pointAt(pos.d), [sx,sy] = proj(pt.x,pt.y,pt.z), sel = selected===tr.num, late = (tr.delay||0) >= 5;
+      const col = "125,211,252";
+      g.save();
+      g.globalAlpha = pt.tun ? .6 : 1;
+      g.fillStyle = `rgba(${col},${.18 + .2*pulse})`; g.beginPath(); g.arc(sx,sy,(sel?16:11)+3*pulse,0,7); g.fill();
+      g.shadowColor = `rgb(${col})`; g.shadowBlur = 10; g.fillStyle = `rgb(${col})`; g.beginPath(); g.arc(sx,sy,sel?6.5:5,0,7); g.fill();
+      g.shadowBlur = 0;
+      if(late){ g.strokeStyle = "#fb8a4c"; g.lineWidth = 2; g.beginPath(); g.arc(sx,sy,sel?10:8.5,0,7); g.stroke(); }
+      if(sel){ g.strokeStyle = "#ffffff"; g.lineWidth = 1.5; g.beginPath(); g.arc(sx,sy,9+4*pulse,0,7); g.stroke(); }
+      if(sel || trains.length <= 6 || W > 520){
+        g.font = `700 ${sel?13:11}px "Barlow Condensed","Arial Narrow",sans-serif`; g.textAlign = "center";
+        const txt = (live ? tr.num : tr.stops[0].dep) + (tr.delay ? ` +${tr.delay}'` : "");
+        const tw = g.measureText(txt).width + 10, ty = sy + (sy > H*.6 ? 22 : -16);
+        g.fillStyle = "rgba(10,16,29,.85)"; g.beginPath(); g.roundRect(sx-tw/2, ty-11, tw, 15, 4); g.fill();
+        g.fillStyle = late ? "#fb8a4c" : `rgb(${col})`; g.fillText(txt, sx, ty);
+      }
+      g.restore();
+      hits.push({num:tr.num, x:sx, y:sy});
+    }
+    $("map-src").textContent = (live ? "En direct · position estimée" : "Horaires théoriques · ZOU Nice ⇄ Monaco") + ` · ${trains.length} train${trains.length>1?"s":""}`;
+    paintSide(live, trains);
+    raf = requestAnimationFrame(frame);
+  }
+  let lastSide = "";
+  function paintSide(live, trains){
+    const nm = nowMin(new Date());
+    const sel = trains.find(x => x.tr.num === selected);
+    const key = JSON.stringify([selected, trains.map(x => x.tr.num + (x.pos.next ? x.pos.next.k : "") + x.tr.delay), nm]);
+    if(key === lastSide) return; lastSide = key;
+    $("running").innerHTML = trains.length ? trains.map(({tr,pos}) => {
+      const to = ST[pos.dir] ? ST[pos.dir][2] : tr.direction;
+      return `<button type="button" data-num="${esc(tr.num)}" aria-pressed="${tr.num===selected}">${live ? esc(tr.num) : esc(tr.stops[0].dep)}${tr.delay>0?` <span style="color:var(--soon)">+${tr.delay}</span>`:""}<small>vers ${esc(to)}</small></button>`;
+    }).join("") : `<p class="note">Aucun train entre St-Augustin et Monaco en ce moment.</p>`;
+    const card = $("map-card");
+    if(!sel){ card.hidden = true; return; }
+    const {tr,pos} = sel, n = pos.next;
+    const mineStop = corridor(tr.stops, tr.delay||0).find(s => s.k === station);
+    const lines = [];
+    if(pos.at) lines.push(`À quai à ${ST[pos.at][2]}`);
+    if(n) lines.push(`Prochain arrêt ${ST[n.k][2]} à ${fromMin(Math.round(n.arr))}`);
+    if(mineStop && mineStop.arr > nm) lines.push(`À ${LABEL[station]} à ${fromMin(Math.round(mineStop.arr))} (${fmtIn(Math.round(mineStop.arr - nm))})`);
+    card.hidden = false;
+    card.innerHTML = `<button class="close" type="button" aria-label="Fermer">✕</button>
+      <div class="t">${esc(tr.mode||"Train")} ${live ? esc(tr.num) : ""} <span class="${tr.delay>=5?"late":"ok"}" style="font-size:1rem">${tr.delay>0?`retard ${tr.delay} min`:live?"à l'heure":"horaire théorique"}</span></div>
+      <div class="s">Vers ${esc(ST[pos.dir] ? ST[pos.dir][2] : tr.direction)}${tr.direction && live ? ` (terminus ${esc(tr.direction)})` : ""}</div>
+      ${lines.map(l => `<div class="s">${esc(l)}</div>`).join("")}`;
+    card.querySelector(".close").onclick = () => { selected = null; lastSide = ""; };
+  }
+
+  async function fetchData(force){
+    if(!API_BASE || !navigator.onLine) return;
+    if(!force && Date.now()-lastFetch < 60000) return;
+    lastFetch = Date.now();
+    try{ data = await api("/api/map"); store.set("mapData", data); lastSide = ""; }catch(e){}
+  }
+  function onTap(ev){
+    const r = cv.getBoundingClientRect(), x = ev.clientX - r.left, y = ev.clientY - r.top;
+    let best = null, bd = 26;
+    for(const h of hits){ const d = Math.hypot(h.x-x, h.y-y); if(d < bd){ bd = d; best = h; } }
+    selected = best ? best.num : null; lastSide = "";
+  }
+  let inited = false;
+  function init(){
+    if(inited) return; inited = true;
+    cv = $("map"); ctx = cv.getContext("2d");
+    cv.addEventListener("click", onTap);
+    $("running").addEventListener("click", e => { const b = e.target.closest("button[data-num]"); if(b){ selected = b.dataset.num === selected ? null : b.dataset.num; lastSide = ""; } });
+    new ResizeObserver(() => { if(visible) fit(); }).observe(cv);
+    if(document.fonts) document.fonts.ready.then(() => { if(visible) fit(); });
+  }
+  return {
+    open(){ init(); visible = true; fit(); cancelAnimationFrame(raf); raf = requestAnimationFrame(frame); fetchData(true); clearInterval(timer); timer = setInterval(() => fetchData(), 20000); },
+    close(){ visible = false; cancelAnimationFrame(raf); clearInterval(timer); },
+    select(num){ selected = num; lastSide = ""; },
+    redraw(){ if(visible) fit(); },
+  };
+})();
+
+// ---------- boucle ----------
+render(); refresh(true);
+setInterval(() => { if(!document.hidden){ render(); refresh(); } }, 20000);
+document.addEventListener("visibilitychange", () => { if(!document.hidden){ render(); refresh(); if(tab==="game") loadGame(); } });
+addEventListener("online", () => { refresh(true); if(tab==="game") loadGame(); });
+// Nettoyage du cache temps réel des jours passés
+(() => { const day = serviceDate(new Date()); for(const k in boards) if(boards[k].day !== day) delete boards[k]; store.set("boards", boards); })();
+
+if("serviceWorker" in navigator){ addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{})); }
+</script>
 </body>
 </html>
