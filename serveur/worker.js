@@ -8,6 +8,7 @@ const STATIONS = {
   ville:   { q: "Nice Ville",           match: /nice.?ville/i,  fallback: "stop_area:SNCF:87756056", label: "Nice-Ville" },
   riquier: { q: "Nice Riquier",         match: /riquier/i,      fallback: null,                      label: "Nice-Riquier" },
   staug:   { q: "Nice Saint-Augustin",  match: /augustin/i,     fallback: null,                      label: "Nice-St-Augustin" },
+  stlaurent: { q: "Saint-Laurent-du-Var", match: /laurent/i,    fallback: null,                      label: "St-Laurent-du-Var" },
   monaco:  { q: "Monaco Monte-Carlo",   match: /monaco/i,       fallback: "stop_area:SNCF:87756403", label: "Monaco" },
   antibes: { q: "Antibes",              match: /^antibes/i,     fallback: "stop_area:SNCF:87757625", label: "Antibes" },
 };
@@ -62,6 +63,7 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS bets(id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, day TEXT NOT NULL, train TEXT NOT NULL, dep TEXT NOT NULL, late INTEGER NOT NULL, minutes INTEGER NOT NULL DEFAULT 0, created TEXT NOT NULL, settled INTEGER NOT NULL DEFAULT 0, points INTEGER, UNIQUE(user_id, day, train))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS results(day TEXT NOT NULL, train TEXT NOT NULL, dep TEXT NOT NULL, delay INTEGER, cancelled INTEGER NOT NULL DEFAULT 0, void INTEGER NOT NULL DEFAULT 0, updated TEXT NOT NULL, PRIMARY KEY(day, train))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS paris(user_id INTEGER NOT NULL, day TEXT NOT NULL, train TEXT NOT NULL, dep TEXT NOT NULL, tier INTEGER NOT NULL, points INTEGER NOT NULL, created TEXT NOT NULL, settled INTEGER NOT NULL DEFAULT 0, won INTEGER NOT NULL DEFAULT 0, actual INTEGER, PRIMARY KEY(user_id, day))`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS notes(user_id INTEGER NOT NULL, day TEXT NOT NULL, station TEXT NOT NULL, train TEXT NOT NULL, dep TEXT NOT NULL, voie TEXT, length TEXT, zone INTEGER, created TEXT NOT NULL, PRIMARY KEY(user_id, day, station, train))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS cache(k TEXT PRIMARY KEY, v TEXT NOT NULL, t INTEGER NOT NULL)`),
   ]);
   schemaReady = true;
@@ -412,6 +414,51 @@ async function settle(env, ms = Date.now()) {
   return { settled: ready.length };
 }
 
+// ---------- carnet partagé : voie, longueur, où se mettre sur le quai ----------
+const LENGTHS = ["court", "long", "double"];
+const ZONES = 8;                                   // quai découpé en 8 zones, de « côté Nice » à « côté Italie »
+async function addNote(env, req) {
+  const me = await userFrom(env, req);
+  if (!me) return err(401, "Rejoins d'abord l'équipe (onglet Paris) pour noter un train.");
+  const b = await req.json().catch(() => ({}));
+  const station = String(b.station || "");
+  if (!STATIONS[station]) return err(400, "Gare inconnue.");
+  const train = String(b.train || "").slice(0, 12), dep = String(b.dep || "");
+  if (!train || !/^\d\d:\d\d$/.test(dep)) return err(400, "Train inconnu.");
+  const voie = b.voie == null || b.voie === "" ? null : String(b.voie).trim().toUpperCase().slice(0, 4);
+  const length = LENGTHS.includes(b.length) ? b.length : null;
+  const zone = Number.isInteger(b.zone) && b.zone >= 0 && b.zone < ZONES ? b.zone : null;
+  if (voie === null && length === null && zone === null) return err(400, "Note au moins la voie, la longueur ou la zone.");
+  await env.DB.prepare(
+    `INSERT INTO notes(user_id, day, station, train, dep, voie, length, zone, created) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(user_id, day, station, train) DO UPDATE SET voie = excluded.voie, length = excluded.length, zone = excluded.zone, dep = excluded.dep, created = excluded.created`
+  ).bind(me.id, serviceDay(), station, train, dep, voie, length, zone, new Date().toISOString()).run();
+  return json({ ok: true });
+}
+// Pour chaque train d'une gare : ce qui revient le plus souvent sur les 90 derniers jours
+async function notesFor(env, station) {
+  if (!STATIONS[station]) return err(400, "Gare inconnue.");
+  const since = addDays(serviceDay(), -90);
+  const { results } = await env.DB.prepare(
+    "SELECT train, dep, voie, length, zone, day FROM notes WHERE station = ? AND day >= ? ORDER BY day DESC"
+  ).bind(station, since).all();
+  const by = {};
+  for (const r of results) {
+    const t = by[r.train] ||= { train: r.train, dep: r.dep, n: 0, voies: {}, lengths: {}, zones: Array(ZONES).fill(0), last: r.day };
+    t.n++;
+    if (r.voie) t.voies[r.voie] = (t.voies[r.voie] || 0) + 1;
+    if (r.length) t.lengths[r.length] = (t.lengths[r.length] || 0) + 1;
+    if (r.zone !== null && r.zone !== undefined) t.zones[r.zone]++;
+  }
+  const top = o => { const e = Object.entries(o).sort((a, b) => b[1] - a[1])[0]; return e ? { v: e[0], n: e[1] } : null; };
+  const trains = Object.values(by).map(t => {
+    const zmax = Math.max(...t.zones);
+    return { train: t.train, dep: t.dep, n: t.n, last: t.last, voie: top(t.voies), length: top(t.lengths),
+      zone: zmax > 0 ? { v: t.zones.indexOf(zmax), n: zmax } : null, zones: t.zones };
+  });
+  return json({ station, zones: ZONES, trains });
+}
+
 // ---------- HTTP ----------
 const CORS = {
   "Access-Control-Allow-Origin": "*",
@@ -441,6 +488,8 @@ export default {
       }
       if (url.pathname === "/api/map" && req.method === "GET") return json(await mapTrains(env));
       if (url.pathname === "/api/game" && req.method === "GET") return json(await game(env, req));
+      if (url.pathname === "/api/notes" && req.method === "GET") return notesFor(env, url.searchParams.get("station"));
+      if (url.pathname === "/api/note" && req.method === "POST") return addNote(env, req);
       if (url.pathname === "/api/join" && req.method === "POST") return join(env, req);
       if (url.pathname === "/api/bet" && req.method === "POST") return placeBet(env, req);
       if (url.pathname === "/api/settle" && req.method === "POST") {
