@@ -169,6 +169,33 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
 .mybet{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;padding:12px;border-radius:12px;background:var(--bg);border:1px dashed var(--line)}
 .mybet b{font:700 1.2rem var(--f-display)}
 .res-ok{color:var(--good);font-weight:700} .res-ko{color:var(--bad);font-weight:700}
+/* Fiche d'un train : d'habitude + noter */
+.sheet{position:fixed;inset:0;z-index:30;background:rgba(5,10,20,.55);display:flex;align-items:flex-end;justify-content:center}
+.sheet-card{width:100%;max-width:560px;max-height:88vh;overflow:auto;background:var(--surface);color:var(--ink);border-radius:18px 18px 0 0;border:1px solid var(--line);
+  padding:18px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
+.sheet-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.sheet-top .t{font:700 2.2rem var(--f-display);line-height:1}
+.sheet-top .x{border:0;background:var(--bg);color:var(--ink);width:38px;height:38px;border-radius:10px;font-size:1.1rem;cursor:pointer;flex:none}
+.usual{display:flex;flex-wrap:wrap;gap:8px}
+.usual span{font:600 .95rem var(--f-body);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.usual span b{font-family:var(--f-display);font-size:1.1rem}
+.quai{display:flex;flex-direction:column;gap:6px}
+.quai-ends{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.quai-zones{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;align-items:end}
+.quai-zones button{position:relative;height:64px;border:1px solid var(--line);background:var(--bg);border-radius:8px;cursor:pointer;padding:0;display:flex;align-items:flex-end;overflow:hidden}
+.quai-zones button i{display:block;width:100%;background:color-mix(in srgb,var(--sea) 55%,transparent)}
+.quai-zones button.top i{background:var(--good)}
+.quai-zones button[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 2px var(--ink)}
+.quai-zones button span{position:absolute;top:4px;left:0;right:0;text-align:center;font:600 .75rem var(--f-display);color:var(--muted)}
+.quai-edge{height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,var(--accent) 0 10px,transparent 10px 16px)}
+.quai-head{font-size:.82rem;color:var(--muted);text-align:center}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:9px;padding:10px 6px;font:600 .95rem var(--f-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.row2{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:center}
+.row2 input{max-width:110px;text-transform:uppercase}
+#list li .usualtag{display:block;width:fit-content;max-width:100%;margin-top:4px;font:600 .72rem var(--f-body);letter-spacing:.03em;color:var(--sea);border:1px solid color-mix(in srgb,var(--sea) 40%,transparent);border-radius:4px;padding:1px 6px;white-space:normal}
+.quai-zones button.top span{color:var(--on-good)}
 .check{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;font-size:.95rem}
 .check input{width:22px;height:22px;margin-top:1px;flex:none;accent-color:var(--ink)}
 .check small{display:block;color:var(--muted)}
@@ -193,6 +220,7 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
       <button type="button" data-st="ville">Nice-Ville <small>centre</small></button>
       <button type="button" data-st="riquier">Nice-Riquier <small>port, est</small></button>
       <button type="button" data-st="staug">Nice-St-Augustin <small>ouest, aéroport</small></button>
+      <button type="button" data-st="stlaurent">St-Laurent-du-Var <small>après le Var</small></button>
     </div>
     <label class="check"><input type="checkbox" id="use-antibes"><span>Je vais aussi à Antibes<small>Ajoute les trajets Nice ⇄ Antibes et Monaco → Antibes.</small></span></label>
     <div class="walkset">
@@ -254,7 +282,7 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
   <!-- CARTE -->
   <section id="pane-map" hidden style="flex-direction:column">
     <div class="mapbox">
-      <canvas id="map" aria-label="Carte de la côte de Nice-St-Augustin à Monaco avec les trains en circulation"></canvas>
+      <canvas id="map" aria-label="Carte de la côte de St-Laurent-du-Var à Monaco avec les trains en circulation"></canvas>
       <div class="map-src" id="map-src"></div>
     </div>
     <div class="map-card" id="map-card" hidden></div>
@@ -268,6 +296,8 @@ input[type=text],select{font:500 1rem var(--f-body);padding:11px 12px;border-rad
     <div id="game"></div>
   </section>
 </div>
+
+<div class="sheet" id="sheet" hidden><div class="sheet-card" id="sheet-card" role="dialog" aria-modal="true"></div></div>
 
 <script>
 // ====== À REMPLIR : l'adresse de ton serveur Cloudflare (sans / à la fin) ======
@@ -318,11 +348,11 @@ ROUTES.monant = { name:"Antibes", far:"antibes", from:"monaco", oneWay:true, fli
     const n = ROUTES.antibes.ab.find(([nd]) => _tm(nd) >= _tm(a) + 2);
     return n ? [d, n[1], {...(o||{}), f: o && o.f ? [o.f[0], n[1]] : undefined, via:1}] : null;
   }).filter(Boolean) };
-const LABEL = {ville:"Nice-Ville", riquier:"Nice-Riquier", staug:"Nice-St-Augustin", monaco:"Monaco", antibes:"Antibes"};
+const LABEL = {ville:"Nice-Ville", riquier:"Nice-Riquier", staug:"Nice-St-Augustin", stlaurent:"St-Laurent-du-Var", monaco:"Monaco", antibes:"Antibes"};
 // Décalage approximatif (minutes) par rapport à Nice-Ville, pour la grille hors ligne
 const OFFS = {
-  monaco:{ab:{ville:0,riquier:5,staug:-10}, ba:{ville:0,riquier:-4,staug:10}},
-  antibes:{ab:{ville:0,riquier:-5,staug:9}, ba:{ville:0,riquier:4,staug:-9}}
+  monaco:{ab:{ville:0,riquier:5,staug:-10,stlaurent:-14}, ba:{ville:0,riquier:-4,staug:10,stlaurent:13}},
+  antibes:{ab:{ville:0,riquier:-5,staug:9,stlaurent:11}, ba:{ville:0,riquier:4,staug:-9,stlaurent:-11}}
 };
 
 // ---------- utilitaires ----------
@@ -386,6 +416,7 @@ $("use-antibes").onchange = () => { useAntibes = $("use-antibes").checked; store
 async function refresh(force){
   if(!API_BASE || !station || !route) return;
   const [from, to] = legKey(), key = from+">"+to;
+  fetchNotes(from, force);
   if(fetching[key]) return;
   if(!force && lastFetch[key] && Date.now()-lastFetch[key] < 60000) return;
   fetching[key] = true;
@@ -458,7 +489,8 @@ function render(){
     $("h-in").textContent = fmtIn(toMin(e)-mins);
     $("h-in").className = "pill tnum" + (t.delay>=5 ? " bad" : "");
     const a = t.arrRt || t.arr;
-    $("h-arr").textContent = `Arrivée ${toL} ${a}` + (t.delay>0 ? ` · retard ${t.delay} min` : "") + (t.approx ? " · heure approx." : "") + (t.via ? " · changement possible à Nice" : "") + (t.q ? " · jour à vérifier" : "") + (t.mode && t.mode!=="TER" ? ` · ${t.mode}` : "");
+    const un = usualOf(from, t);
+    $("h-arr").textContent = `Arrivée ${toL} ${a}` + (un ? ` · d'habitude ${un}` : "") + (t.delay>0 ? ` · retard ${t.delay} min` : "") + (t.approx ? " · heure approx." : "") + (t.via ? " · changement possible à Nice" : "") + (t.q ? " · jour à vérifier" : "") + (t.mode && t.mode!=="TER" ? ` · ${t.mode}` : "");
     const tl = [...tight];
     $("h-then").innerHTML = catchable.slice(1,4).map(x => `<span>${eff(x)}${x.delay>=5?" ⚠":""}</span>`).join("")
       + (tl.length ? `<span class="walk" style="border-style:dashed">trop juste : ${tl.map(eff).join(", ")}</span>` : "");
@@ -484,7 +516,9 @@ function render(){
     if(t.q) tags += '<span class="tag q">à vérifier</span>';
     const depHtml = (t.delay>0 && t.depRt && !cancel) ? `${e}<s>${t.dep}</s>` : (t.approx ? "≈"+t.dep : t.dep);
     const right = cancel ? "" : past ? "parti" : fmtIn(tm-mins);
-    return `<li class="${cls}"${t.num?` data-num="${esc(t.num)}"`:""}><span class="dep tnum">${depHtml}</span><span class="to tnum">→ ${esc(toL)} ${t.arrRt||t.arr}${tags}</span><span class="in tnum">${right}</span></li>`;
+    const un = usualOf(from, t);
+    if(un) tags += `<span class="usualtag">${esc(un)}</span>`;
+    return `<li class="${cls}" data-dep="${t.dep}"${t.num?` data-num="${esc(t.num)}"`:""}><span class="dep tnum">${depHtml}</span><span class="to tnum">→ ${esc(toL)} ${t.arrRt||t.arr}${tags}</span><span class="in tnum">${right}</span></li>`;
   }).join("");
 
   // Bandeau
@@ -506,7 +540,7 @@ function render(){
   if(!useLive && list.some(t=>t.q)) notes.push("« À vérifier » : la fiche ne dit pas clairement si ce train roule le samedi, le dimanche ou les deux.");
   $("daynote").textContent = notes.join(" ");
 }
-const short = s => s==="ville" ? "Nice" : s==="riquier" ? "Riquier" : "St-Augustin";
+const short = s => ({ville:"Nice", riquier:"Riquier", staug:"St-Augustin", stlaurent:"St-Laurent"})[s] || s;
 
 $("r-monaco").onclick = () => { manualRoute=true; manualDir=false; route="monaco"; render(); refresh(); };
 $("r-antibes").onclick = () => { manualRoute=true; manualDir=false; route="antibes"; render(); refresh(); };
@@ -514,6 +548,87 @@ $("r-monant").onclick = () => { manualRoute=true; manualDir=false; route="monant
 $("b-ab").onclick = () => { manualDir=true; dir="ab"; render(); refresh(); };
 $("b-ba").onclick = () => { manualDir=true; dir="ba"; render(); refresh(); };
 $("showpast").onchange = () => { store.set("showpast", $("showpast").checked); render(); };
+
+// ---------- carnet partagé : voie, longueur, où se mettre sur le quai ----------
+let notes = store.get("notes", {}), notesAt = {};
+async function fetchNotes(st, force){
+  if(!API_BASE || !st) return;
+  if(!force && notesAt[st] && Date.now() - notesAt[st] < 5*60e3) return;
+  notesAt[st] = Date.now();
+  try{ const r = await api(`/api/notes?station=${st}`); notes[st] = r; store.set("notes", notes); render(); }catch(e){}
+}
+function noteOf(st, num, dep){
+  const n = notes[st]; if(!n) return null;
+  return (num && n.trains.find(x => x.train === num)) || n.trains.find(x => x.dep === dep) || null;
+}
+const LEN = {court:"court", long:"long", double:"double"};
+function usualOf(st, t){
+  const n = noteOf(st, t.num, t.dep); if(!n) return "";
+  const parts = [];
+  if(n.voie) parts.push(`voie ${n.voie.v}`);
+  if(n.length) parts.push(LEN[n.length.v]);
+  if(n.zone) parts.push(`zone ${n.zone.v + 1}`);
+  return parts.join(" · ");
+}
+const ORDER = {antibes:0, stlaurent:1, staug:2, ville:3, riquier:4, monaco:5};
+const SIDES = st => st === "monaco" ? ["côté Nice", "côté Menton"] : st === "antibes" ? ["côté Cannes", "côté Nice"] : ["côté Antibes", "côté Monaco"];
+let sheetState = null;
+function openSheet(num, dep){
+  const [from, to] = legKey();
+  sheetState = { num, dep, from, to, voie: "", length: null, zone: null, msg: "" };
+  const mine = noteOf(from, num, dep);
+  fetchNotes(from, true);
+  paintSheet(); $("sheet").hidden = false;
+}
+function closeSheet(){ $("sheet").hidden = true; sheetState = null; }
+$("sheet").addEventListener("click", e => { if(e.target === $("sheet")) closeSheet(); });
+function paintSheet(){
+  const S = sheetState; if(!S) return;
+  const n = noteOf(S.from, S.num, S.dep), [left, right] = SIDES(S.from);
+  const goesRight = ORDER[S.to] > ORDER[S.from];
+  const zones = n ? n.zones : Array(8).fill(0), zmax = Math.max(1, ...zones);
+  const token = store.get("token");
+  let h = `<div class="sheet-top"><div><div class="eyebrow" style="opacity:.7">${esc(LABEL[S.from])} → ${esc(LABEL[S.to])}</div>
+    <div class="t tnum">${S.dep}</div><div class="note">${S.num ? "Train " + esc(S.num) : "Horaire théorique"}</div></div>
+    <button class="x" type="button" id="sh-x" aria-label="Fermer">✕</button></div>`;
+  h += `<div class="pick"><h3>D'habitude</h3>`;
+  h += n ? `<div class="usual">${n.voie ? `<span>Voie <b>${esc(n.voie.v)}</b></span>` : ""}${n.length ? `<span>Train <b>${LEN[n.length.v]}</b></span>` : ""}${n.zone ? `<span>Zone <b>${n.zone.v + 1}</b></span>` : ""}</div>
+      <p class="note">${n.n} relevé${n.n > 1 ? "s" : ""} par l'équipe, le dernier le ${fmtDate(n.last)}.</p>`
+    : `<p class="note">Personne n'a encore noté ce train à ${esc(LABEL[S.from])}. Sois le premier.</p>`;
+  h += `</div>`;
+  // Schéma du quai : historique (barres) + choix de sa zone
+  h += `<div class="quai"><div class="quai-ends"><span>${left}</span><span>${right}</span></div>
+    <div class="quai-zones">${zones.map((c, i) => `<button type="button" data-zone="${i}" aria-pressed="${S.zone === i}" class="${n && n.zone && n.zone.v === i ? "top" : ""}" aria-label="Zone ${i + 1}${c ? `, ${c} relevé${c > 1 ? "s" : ""}` : ""}"><span>${i + 1}</span><i style="height:${Math.round(4 + 52 * c / zmax)}px"></i></button>`).join("")}</div>
+    <div class="quai-edge"></div>
+    <div class="quai-head">${goesRight ? "Le train part vers la droite →" : "← Le train part vers la gauche"} · la barre verte est la zone la plus notée</div></div>`;
+  // Noter
+  if(!token){
+    h += `<p class="note">Pour noter ce train, rejoins l'équipe dans l'onglet <b>Paris</b>.</p>`;
+  } else if(!S.num){
+    h += `<p class="note">Avec du réseau, tu pourras noter ce train.</p>`;
+  } else {
+    h += `<div class="pick"><h3>Noter ce train aujourd'hui</h3>
+      <div class="row2"><label for="sh-voie" class="note">Voie</label><input type="text" id="sh-voie" maxlength="4" autocomplete="off" value="${esc(S.voie)}" placeholder="ex. B"></div>
+      <div class="seg">${["court","long","double"].map(l => `<button type="button" data-len="${l}" aria-pressed="${S.length === l}">${l[0].toUpperCase() + l.slice(1)}</button>`).join("")}</div>
+      <p class="note">Puis touche sur le schéma la zone où tu étais devant une porte.</p>
+      <button class="btn" id="sh-save" type="button">Enregistrer</button>
+      <p class="msg" id="sh-msg">${esc(S.msg)}</p></div>`;
+  }
+  if(S.num) h += `<button class="btn ghost" id="sh-map" type="button">Voir ce train sur la carte</button>`;
+  $("sheet-card").innerHTML = h;
+  $("sh-x").onclick = closeSheet;
+  $("sheet-card").querySelectorAll("[data-zone]").forEach(b => b.onclick = () => { S.zone = S.zone === +b.dataset.zone ? null : +b.dataset.zone; S.voie = ($("sh-voie")||{}).value || S.voie; paintSheet(); });
+  $("sheet-card").querySelectorAll("[data-len]").forEach(b => b.onclick = () => { S.length = S.length === b.dataset.len ? null : b.dataset.len; S.voie = ($("sh-voie")||{}).value || S.voie; paintSheet(); });
+  const sv = $("sh-save"); if(sv) sv.onclick = async () => {
+    S.voie = $("sh-voie").value.trim();
+    try{
+      await api("/api/note", {method:"POST", body: JSON.stringify({station: S.from, train: S.num, dep: S.dep, voie: S.voie, length: S.length, zone: S.zone})});
+      S.msg = ""; await fetchNotes(S.from, true); paintSheet();
+      const m = $("sh-msg"); if(m){ m.textContent = "Merci, c'est noté pour l'équipe."; m.style.color = "var(--good)"; }
+    }catch(e){ S.msg = e.message; paintSheet(); }
+  };
+  const mp = $("sh-map"); if(mp) mp.onclick = () => { const num = S.num; closeSheet(); setTab("map"); MAP.select(num); };
+}
 
 // ---------- onglets ----------
 function setTab(t){
@@ -529,7 +644,7 @@ function setTab(t){
 $("tab-trains").onclick = () => setTab("trains");
 $("tab-map").onclick = () => setTab("map");
 $("tab-game").onclick = () => setTab("game");
-$("list").addEventListener("click", e => { const li = e.target.closest("li[data-num]"); if(li){ setTab("map"); MAP.select(li.dataset.num); } });
+$("list").addEventListener("click", e => { const li = e.target.closest("li[data-dep]"); if(li) openSheet(li.dataset.num || "", li.dataset.dep); });
 
 // ---------- Paris ----------
 let gameData = null, gameErr = "", pickTrain = null, busy = false;
@@ -641,22 +756,22 @@ function rulesHtml(g){
 const MAP = (() => {
   const LON0 = 7.30, LAT0 = 43.70, KX = 80.5, KY = 111.2;          // km par degré à cette latitude
   const P = (lon, lat) => [(lon - LON0) * KX, (lat - LAT0) * KY];
-  const COAST = [[7.180,43.655],[7.195,43.656],[7.200,43.650],[7.212,43.646],[7.226,43.652],[7.229,43.664],[7.240,43.677],[7.252,43.688],[7.266,43.693],[7.279,43.695],
+  const COAST = [[7.130,43.651],[7.148,43.652],[7.165,43.652],[7.180,43.655],[7.195,43.656],[7.200,43.650],[7.212,43.646],[7.226,43.652],[7.229,43.664],[7.240,43.677],[7.252,43.688],[7.266,43.693],[7.279,43.695],
     [7.286,43.693],[7.292,43.695],[7.301,43.692],[7.308,43.688],[7.311,43.695],[7.314,43.702],[7.318,43.699],[7.320,43.690],[7.324,43.681],[7.331,43.672],
     [7.338,43.676],[7.342,43.685],[7.336,43.691],[7.334,43.700],[7.340,43.707],[7.350,43.711],[7.362,43.714],[7.373,43.711],[7.384,43.716],[7.396,43.719],
     [7.405,43.720],[7.414,43.725],[7.420,43.729],[7.424,43.736],[7.432,43.739],[7.440,43.742],[7.452,43.747],[7.462,43.752],[7.475,43.757],[7.490,43.763]].map(([a,b]) => P(a,b));
   const ST = {   // gares sur la ligne, dans l'ordre
-    staug:[7.2137,43.6697,"Nice-St-Augustin"], ville:[7.2617,43.7046,"Nice-Ville"], riquier:[7.2862,43.7067,"Nice-Riquier"],
+    stlaurent:[7.1945,43.6625,"St-Laurent-du-Var"], staug:[7.2137,43.6697,"Nice-St-Augustin"], ville:[7.2617,43.7046,"Nice-Ville"], riquier:[7.2862,43.7067,"Nice-Riquier"],
     villefranche:[7.3110,43.7046,"Villefranche"], beaulieu:[7.3325,43.7085,"Beaulieu"], eze:[7.3620,43.7176,"Èze"],
     capdail:[7.4040,43.7246,"Cap-d'Ail"], monaco:[7.4195,43.7388,"Monaco"],
     // Prolongements hors carte (pas affichés comme gares) : d'où arrivent et où repartent les trains
-    w:[7.1945,43.6625,"St-Laurent-du-Var", true], e:[7.4573,43.7606,"Roquebrune", true]
+    w:[7.1495,43.6577,"Cagnes-sur-Mer", true], e:[7.4573,43.7606,"Roquebrune", true]
   };
-  const ST_RE = {staug:/augustin/i, ville:/^nice(\s*-?\s*ville)?$/i, riquier:/riquier/i, villefranche:/villefranche/i, beaulieu:/beaulieu/i, eze:/^[eè]ze/i, capdail:/cap.?d.?ail/i, monaco:/monaco/i,
-    w:/laurent|cagnes|villeneuve|antibes|juan|golfe|cannes|bosquet|frayère|frayere|ranguin|mouans|grasse|biot|marseille|toulon|vence|grasse/i,
+  const ST_RE = {stlaurent:/laurent/i, staug:/augustin/i, ville:/^nice(\s*-?\s*ville)?$/i, riquier:/riquier/i, villefranche:/villefranche/i, beaulieu:/beaulieu/i, eze:/^[eè]ze/i, capdail:/cap.?d.?ail/i, monaco:/monaco/i,
+    w:/cagnes|villeneuve|antibes|juan|golfe|cannes|bosquet|frayère|frayere|ranguin|mouans|grasse|biot|marseille|toulon|vence|grasse/i,
     e:/roquebrune|carnoles|menton|garavan|ventimiglia|vintimille/i};
   // Voie : points [lon, lat, gare?, tunnel jusqu'au point suivant?]
-  const TRACK = [[7.1945,43.6625,"w"],[7.204,43.6658],[7.2137,43.6697,"staug"],[7.228,43.680],[7.240,43.690],[7.252,43.699],[7.2617,43.7046,"ville"],[7.272,43.708],[7.2862,43.7067,"riquier",1],
+  const TRACK = [[7.1495,43.6577,"w"],[7.165,43.6595],[7.180,43.6612],[7.1945,43.6625,"stlaurent"],[7.204,43.6658],[7.2137,43.6697,"staug"],[7.228,43.680],[7.240,43.690],[7.252,43.699],[7.2617,43.7046,"ville"],[7.272,43.708],[7.2862,43.7067,"riquier",1],
     [7.296,43.7055,0,1],[7.304,43.7050],[7.3110,43.7046,"villefranche"],[7.318,43.7058,0,1],[7.326,43.7075],[7.3325,43.7085,"beaulieu"],[7.342,43.7110,0,1],
     [7.350,43.7135],[7.3620,43.7176,"eze"],[7.372,43.7155,0,1],[7.384,43.7190],[7.394,43.7215,0,1],[7.4040,43.7246,"capdail",1],[7.412,43.7300,0,1],[7.4195,43.7388,"monaco",1],[7.430,43.7455,0,1],[7.440,43.7520,0,1],[7.449,43.7570],[7.4573,43.7606,"e"]]
     .map(([lon,lat,st,tun]) => ({p:P(lon,lat), st:st||null, tun:!!tun}));
@@ -665,7 +780,7 @@ const MAP = (() => {
   const PEAKS = [[7.300,43.700,.19,.55],[7.297,43.706,.22,.45],[7.302,43.721,.37,.8],[7.300,43.737,.37,.9],[7.330,43.684,.05,.5],[7.343,43.726,.58,1.0],
     [7.370,43.736,.55,1.2],[7.405,43.741,.55,.7],[7.430,43.772,1.1,1.7],[7.245,43.765,.85,1.7],[7.272,43.722,.13,.8],[7.222,43.702,.26,1.3],[7.385,43.728,.42,.7]]
     .map(([lon,lat,h,s]) => [...P(lon,lat),h,s]);
-  const X0 = -9.8, X1 = 13.4, Y0 = -3.0, Y1 = 7.4, STEP = .3, EX = 2.5, D = 40;
+  const X0 = -12.6, X1 = 13.4, Y0 = -3.0, Y1 = 7.4, STEP = .3, EX = 2.5, D = 40;
   let PITCH = 52*Math.PI/180, portrait = false;   // sur téléphone : carte verticale, Monaco en haut, la mer à droite
 
   const inLand = (x, y) => {           // terre = au nord du trait de côte
@@ -711,9 +826,9 @@ const MAP = (() => {
     K = 1; CX = 0; CY = 0;
     // cadrage sur la voie et la côte, relief compris, avec de la place pour les noms des gares
     const pts = [];
-    for(const t of TRACK) if(t.d >= stDist.staug && t.d <= stDist.monaco) pts.push(proj(t.p[0], t.p[1], t.z));
-    for(const [x,y] of COAST) if(x > -8 && x < 11 && y > -3.2) pts.push(proj(x, y, 0));
-    for(const row of G) for(const q of row) if(q.land && q.x > -7.6 && q.x < 10.6 && q.y < 6.4) pts.push(proj(q.x, q.y, q.z));
+    for(const t of TRACK) if(t.d >= stDist.stlaurent && t.d <= stDist.monaco) pts.push(proj(t.p[0], t.p[1], t.z));
+    for(const [x,y] of COAST) if(x > -9.4 && x < 11 && y > -4.4) pts.push(proj(x, y, 0));
+    for(const row of G) for(const q of row) if(q.land && q.x > -9.2 && q.x < 10.6 && q.y < 6.4) pts.push(proj(q.x, q.y, q.z));
     const minX = Math.min(...pts.map(p=>p[0])), maxX = Math.max(...pts.map(p=>p[0]));
     const minY = Math.min(...pts.map(p=>p[1])), maxY = Math.max(...pts.map(p=>p[1]));
     const padTop = 30, padBot = 26, padX = portrait ? 18 : 14;
@@ -752,15 +867,15 @@ const MAP = (() => {
     for(let i=1;i<TRACK.length;i++){
       const a = TRACK[i-1], b = TRACK[i], pa = proj(a.p[0],a.p[1],a.z), pb = proj(b.p[0],b.p[1],b.z);
       g.save();
-      if(a.d < stDist.staug || a.d >= stDist.monaco) g.globalAlpha = .6;   // prolongements hors carte
+      if(a.d < stDist.stlaurent || a.d >= stDist.monaco) g.globalAlpha = .6;   // prolongements hors carte
       if(a.tun){ g.setLineDash([3,4]); g.strokeStyle = "rgba(242,181,49,.55)"; g.lineWidth = 1.6; }
       else { g.shadowColor = "rgba(242,181,49,.7)"; g.shadowBlur = 6; g.strokeStyle = "#f2b531"; g.lineWidth = 2.4; }
       g.beginPath(); g.moveTo(pa[0],pa[1]); g.lineTo(pb[0],pb[1]); g.stroke(); g.restore();
     }
     // gares : petit mât + nom
     const small = W < 520;
-    const LVL = {staug:0, ville:0, riquier:2, villefranche:0, beaulieu:1, eze:0, capdail:1, monaco:2};
-    const SHORT = {staug:"St-Augustin", ville:"Nice-Ville", riquier:"Riquier", villefranche:"Villefranche", beaulieu:"Beaulieu", eze:"Èze", capdail:"Cap-d'Ail", monaco:"Monaco"};
+    const LVL = {stlaurent:1, staug:0, ville:0, riquier:2, villefranche:0, beaulieu:1, eze:0, capdail:1, monaco:2};
+    const SHORT = {stlaurent:"St-Laurent", staug:"St-Augustin", ville:"Nice-Ville", riquier:"Riquier", villefranche:"Villefranche", beaulieu:"Beaulieu", eze:"Èze", capdail:"Cap-d'Ail", monaco:"Monaco"};
     g.font = `600 ${small?10.5:12.5}px "Barlow Condensed","Arial Narrow",sans-serif`; g.textAlign = "center";
     TRACK.filter(t => t.st && !ST[t.st][3]).forEach(t => {
       const [sx,sy] = proj(t.p[0],t.p[1],t.z), mine = t.st===station || t.st==="monaco";
@@ -903,9 +1018,9 @@ const MAP = (() => {
     const key = JSON.stringify([selected, trains.map(x => x.tr.num + (x.pos.next ? x.pos.next.k : "") + x.tr.delay), nm]);
     if(key === lastSide) return; lastSide = key;
     $("running").innerHTML = trains.length ? trains.map(({tr,pos}) => {
-      const to = ST[pos.dir] ? ST[pos.dir][2] : tr.direction;
+      const to = ST[pos.dir] && !ST[pos.dir][3] ? ST[pos.dir][2] : (tr.direction || ST[pos.dir][2]);
       return `<button type="button" data-num="${esc(tr.num)}" aria-pressed="${tr.num===selected}">${live ? esc(tr.num) : esc(tr.stops[0].dep)}${tr.delay>0?` <span style="color:var(--soon)">+${tr.delay}</span>`:""}<small>vers ${esc(to)}</small></button>`;
-    }).join("") : `<p class="note">Aucun train entre St-Augustin et Monaco en ce moment.</p>`;
+    }).join("") : `<p class="note">Aucun train entre St-Laurent et Monaco en ce moment.</p>`;
     const card = $("map-card");
     if(!sel){ card.hidden = true; return; }
     const {tr,pos} = sel, n = pos.next;
@@ -917,7 +1032,7 @@ const MAP = (() => {
     card.hidden = false;
     card.innerHTML = `<button class="close" type="button" aria-label="Fermer">✕</button>
       <div class="t">${esc(tr.mode||"Train")} ${live ? esc(tr.num) : ""} <span class="${tr.delay>=5?"late":"ok"}" style="font-size:1rem">${tr.delay>0?`retard ${tr.delay} min`:live?"à l'heure":"horaire théorique"}</span></div>
-      <div class="s">Vers ${esc(ST[pos.dir] ? ST[pos.dir][2] : tr.direction)}${tr.direction && live ? ` (terminus ${esc(tr.direction)})` : ""}</div>
+      <div class="s">Vers ${esc(ST[pos.dir] && !ST[pos.dir][3] ? ST[pos.dir][2] : (tr.direction || ST[pos.dir][2]))}${tr.direction && live ? ` (terminus ${esc(tr.direction)})` : ""}</div>
       ${lines.map(l => `<div class="s">${esc(l)}</div>`).join("")}`;
     card.querySelector(".close").onclick = () => { selected = null; lastSide = ""; };
   }

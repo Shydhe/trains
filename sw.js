@@ -1,5 +1,5 @@
 // Garde l'app en cache pour l'ouvrir sans réseau. Change VERSION à chaque mise à jour de index.html.
-const VERSION = "trains-2026-10-22-v4c";
+const VERSION = "trains-2026-10-29-v5";
 const CORE = ["./", "./index.html", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./icon-maskable-512.png", "./apple-touch-icon.png"];
 const FONTS = /^https:\/\/fonts\.(googleapis|gstatic)\.com\//;
 
